@@ -6,9 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Book extends Model {
     protected $fillable = [
-        'publisher_id', 'title', 'isbn_13', 'author', 'edition', 
-        'published_date', 'language', 'pages', 'binding', 
-        'price', 'quantity', 'description', 'is_active'
+        'publisher_id',
+        'author_id',       // <-- Ye missing tha
+        'title',
+        'isbn_13',
+        'edition',         // <-- Naya column
+        'published_date',  // <-- Naya column
+        'binding',         // <-- Naya column
+        'price',
+        'quantity',
+        'description',
+        
+        'is_active',
     ];
 
     public function publisher() { return $this->belongsTo(Publisher::class); }

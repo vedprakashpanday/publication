@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Author;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage; // Image handle karne ke liye
+use App\Traits\ImageManagerTrait; // 1. Trait import kiya
 
 class AuthorController extends Controller
 {
+    use ImageManagerTrait; // 2. Class mein Trait ko use kiya
+
     public function index() {
-        $authors = Author::latest()->paginate(10);
+        $authors = Author::latest()->get();
         return view('admin.authors.index', compact('authors'));
     }
 
@@ -21,11 +23,14 @@ class AuthorController extends Controller
     public function store(Request $request) {
         $request->validate([
             'name' => 'required|string|max:255',
-            'profile_image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+            'profile_image' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:2048', // webp allowed
         ]);
 
-        $imagePath = $request->file('profile_image') ? 
-                     $request->file('profile_image')->store('authors', 'public') : null;
+        // 3. Trait se image convert aur save karayi
+        $imagePath = null;
+        if ($request->hasFile('profile_image')) {
+            $imagePath = $this->uploadAndConvertToWebp($request->file('profile_image'), 'uploads/authors');
+        }
 
         Author::create([
             'name' => $request->name,
@@ -36,24 +41,19 @@ class AuthorController extends Controller
             'famous_works' => $request->famous_works,
         ]);
 
-        return redirect()->route('admin.authors.index')->with('success', 'Author added successfully!');
+        return redirect()->route('admin.authors.index')->with('success', 'Author profile & image optimized successfully!');
     }
 
-    // --- NAYE METHODS (EDIT, UPDATE, DESTROY) --- //
-
     public function edit(Author $author) {
-        // Edit page par author ka data bhejenge
         return view('admin.authors.edit', compact('author'));
     }
 
     public function update(Request $request, Author $author) {
-        // Validation (Image optional hai update ke time)
         $request->validate([
             'name' => 'required|string|max:255',
-            'profile_image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+            'profile_image' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:2048',
         ]);
 
-        // Form ka baaki data ek array mein le lete hain
         $data = [
             'name' => $request->name,
             'born_date' => $request->born_date,
@@ -62,30 +62,24 @@ class AuthorController extends Controller
             'famous_works' => $request->famous_works,
         ];
 
-        // Agar user ne nayi profile image upload ki hai
+        // 4. Update Image Logic (Trait khud purani image delete karega)
         if ($request->hasFile('profile_image')) {
-            // 1. Purani image delete karein
-            if ($author->profile_image && Storage::disk('public')->exists($author->profile_image)) {
-                Storage::disk('public')->delete($author->profile_image);
-            }
-            
-            // 2. Nayi image save karein aur array mein path update karein
-            $data['profile_image'] = $request->file('profile_image')->store('authors', 'public');
+            $data['profile_image'] = $this->uploadAndConvertToWebp(
+                $request->file('profile_image'), 
+                'uploads/authors', 
+                $author->profile_image // Purana path bhej diya delete karne ke liye
+            );
         }
 
-        // Database record update karein
         $author->update($data);
 
         return redirect()->route('admin.authors.index')->with('success', 'Author updated successfully!');
     }
 
     public function destroy(Author $author) {
-        // 1. Database se record delete karne se pehle uski profile picture server se hatayein
-        if ($author->profile_image && Storage::disk('public')->exists($author->profile_image)) {
-            Storage::disk('public')->delete($author->profile_image);
-        }
+        // 5. Delete method from Trait
+        $this->deleteImage($author->profile_image);
 
-        // 2. Database se author ko delete karein
         $author->delete();
 
         return redirect()->route('admin.authors.index')->with('success', 'Author deleted successfully!');

@@ -1,67 +1,91 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+
+// Admin Controllers
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\BookController;
-use App\Http\Controllers\Admin\AuthorController;  
+use App\Http\Controllers\Admin\AuthorController;
 use App\Http\Controllers\Admin\PublisherController;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\StockRequestController;
+use App\Http\Controllers\Admin\SalesController;
+use App\Http\Controllers\Admin\BuyerStoryController;
+use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\SettingController;
 
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Admin Routes (Baad mein ispe middleware lagayenge)
-Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-
-    // Book Management Routes
-    Route::get('/books', [BookController::class, 'index'])->name('admin.books.index'); // <-- Ye line add karein
-    Route::get('/books/create', [BookController::class, 'create'])->name('admin.books.create');
-    Route::post('/books', [BookController::class, 'store'])->name('admin.books.store');
-
-    // Author Routes
-    Route::resource('authors', AuthorController::class)->names([
-        'index' => 'admin.authors.index',
-        'create' => 'admin.authors.create',
-        'store' => 'admin.authors.store',
-        'edit' => 'admin.authors.edit',
-        'update' => 'admin.authors.update',
-        'destroy' => 'admin.authors.destroy',
-    ]);
-
-    // Publisher Routes
-    Route::resource('publishers', PublisherController::class)->names([
-        'index' => 'admin.publishers.index',
-        'create' => 'admin.publishers.create',
-        'store' => 'admin.publishers.store',
-        'edit' => 'admin.publishers.edit',
-        'update' => 'admin.publishers.update',
-        'destroy' => 'admin.publishers.destroy',
-    ]);
-
-
-    // Users & Sellers Management
-    Route::get('/users', [UserController::class, 'index'])->name('admin.users.index');
-    Route::get('/sellers', [UserController::class, 'sellers'])->name('admin.sellers.index');
-    Route::post('/users/{user}/toggle', [UserController::class, 'toggleStatus'])->name('admin.users.toggle');
-
-    Route::get('/orders', [OrderController::class, 'index'])->name('admin.orders.index');
-Route::get('/orders/{order}', [OrderController::class, 'show'])->name('admin.orders.show');
-Route::post('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
-
-Route::post('/orders/{order}/update-tracking', [OrderController::class, 'updateTracking'])->name('admin.orders.updateTracking');
-
-
-});
-
-Route::get('/stock-requests', [StockRequestController::class, 'index'])->name('admin.stock.index');
-Route::post('/stock-requests/{stockRequest}/approve', [StockRequestController::class, 'approve'])->name('admin.stock.approve');
-Route::post('/stock-requests/{stockRequest}/reject', [StockRequestController::class, 'reject'])->name('admin.stock.reject');
-
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+/*
+|--------------------------------------------------------------------------
+| Admin Panel Routes (Protected by Auth & Admin Middleware)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+
+        // --- Core ---
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        // --- Inventory Management ---
+        // Books (CRUD + Status Toggle)
+        Route::resource('books', BookController::class);
+        Route::patch('/books/{book}/toggle', [BookController::class, 'toggleStatus'])->name('books.toggle');
+
+        // Authors (CRUD)
+        Route::resource('authors', AuthorController::class);
+
+        // Publishers (CRUD)
+        Route::resource('publishers', PublisherController::class);
+
+        // --- Operations ---
+        // Orders & Tracking
+        Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+        Route::post('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+        Route::post('/orders/{order}/update-tracking', [OrderController::class, 'updateTracking'])->name('orders.updateTracking');
+
+        // Stock Requests
+        Route::get('/stock-requests', [StockRequestController::class, 'index'])->name('stock.index');
+        Route::post('/stock-requests/{stockRequest}/approve', [StockRequestController::class, 'approve'])->name('stock.approve');
+        Route::post('/stock-requests/{stockRequest}/reject', [StockRequestController::class, 'reject'])->name('stock.reject');
+
+        // Sales Reports
+        Route::get('/sales', [SalesController::class, 'index'])->name('sales.index');
+
+        // --- Community & Marketing ---
+        // Buyer Stories (CRUD + Status Toggle)
+        Route::resource('buyer-stories', BuyerStoryController::class);
+        Route::post('buyer-stories/toggle/{id}', [BuyerStoryController::class, 'toggle'])->name('buyer-stories.toggle');
+
+        // --- User Management ---
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('/sellers', [UserController::class, 'sellers'])->name('sellers.index');
+        Route::post('/users/{user}/toggle', [UserController::class, 'toggleStatus'])->name('users.toggle');
+
+
+
+        // Profile Routes
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+
+    // Settings Routes
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::post('/settings/update', [SettingController::class, 'update'])->name('settings.update');
+    });

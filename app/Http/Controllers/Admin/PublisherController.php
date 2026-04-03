@@ -5,14 +5,17 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Publisher;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage; // Image delete karne ke liye zaroori hai
+use App\Traits\ImageManagerTrait; // 1. Trait import kiya
 
 class PublisherController extends Controller
 {
+    use ImageManagerTrait; // 2. Class mein Trait ko use kiya
+
     public function index()
     {
-        // Har publisher ki total books count ke sath fetch karenge
-        $publishers = Publisher::withCount('books')->latest()->paginate(10);
+        // Har publisher ki total books count ke sath fetch karenge.
+        // DataTables use karne ke liye paginate(10) ki jagah get() best hai.
+        $publishers = Publisher::withCount('books')->latest()->get();
         return view('admin.publishers.index', compact('publishers'));
     }
 
@@ -25,15 +28,15 @@ class PublisherController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048', // WebP allowed
             'contact_no' => 'nullable|string|max:20',
             'address' => 'nullable|string',
         ]);
 
-        // Logo Upload Logic
+        // 3. Logo Upload & Convert to WebP via Trait
         $logoPath = null;
         if ($request->hasFile('logo')) {
-            $logoPath = $request->file('logo')->store('publishers/logos', 'public');
+            $logoPath = $this->uploadAndConvertToWebp($request->file('logo'), 'uploads/publishers/logos');
         }
 
         Publisher::create([
@@ -43,14 +46,11 @@ class PublisherController extends Controller
             'address' => $request->address,
         ]);
 
-        return redirect()->route('admin.publishers.index')->with('success', 'Publication added successfully!');
+        return redirect()->route('admin.publishers.index')->with('success', 'Publication added & logo optimized successfully!');
     }
-
-    // --- NAYE METHODS YAHAN SE HAIN --- //
 
     public function edit(Publisher $publisher)
     {
-        // Edit form dikhane ke liye publisher ka data bhej rahe hain
         return view('admin.publishers.edit', compact('publisher'));
     }
 
@@ -58,7 +58,7 @@ class PublisherController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'contact_no' => 'nullable|string|max:20',
             'address' => 'nullable|string',
         ]);
@@ -70,18 +70,15 @@ class PublisherController extends Controller
             'address' => $request->address,
         ];
 
-        // Agar user ne naya logo upload kiya hai
+        // 4. Update Image Logic (Trait khud purani image delete karega)
         if ($request->hasFile('logo')) {
-            // 1. Purana logo storage se delete karein (agar exist karta hai)
-            if ($publisher->logo && Storage::disk('public')->exists($publisher->logo)) {
-                Storage::disk('public')->delete($publisher->logo);
-            }
-            
-            // 2. Naya logo save karein aur array mein add karein
-            $data['logo'] = $request->file('logo')->store('publishers/logos', 'public');
+            $data['logo'] = $this->uploadAndConvertToWebp(
+                $request->file('logo'), 
+                'uploads/publishers/logos', 
+                $publisher->logo // Purana logo path, taaki wo delete ho jaye
+            );
         }
 
-        // Database mein record update karein
         $publisher->update($data);
 
         return redirect()->route('admin.publishers.index')->with('success', 'Publication updated successfully!');
@@ -89,12 +86,10 @@ class PublisherController extends Controller
 
     public function destroy(Publisher $publisher)
     {
-        // 1. Database se record delete karne se pehle uska logo server se delete karein
-        if ($publisher->logo && Storage::disk('public')->exists($publisher->logo)) {
-            Storage::disk('public')->delete($publisher->logo);
-        }
+        // 5. Database se record delete karne se pehle uska logo server se delete karein via Trait
+        $this->deleteImage($publisher->logo);
 
-        // 2. Database se record delete karein
+        // Database se record delete karein
         $publisher->delete();
 
         return redirect()->route('admin.publishers.index')->with('success', 'Publication deleted successfully!');

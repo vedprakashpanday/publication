@@ -1,31 +1,31 @@
 @extends('layouts.admin')
-@section('page_title', 'Add New Book')
+@section('page_title', 'Edit Book')
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+
 @section('content')
 <div class="card border-0 shadow-sm" style="border-radius: 12px;">
-    <div class="card-body ">
-       @if ($errors->any())
+    <div class="card-body">
+        
+        @if ($errors->any())
     <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-4" id="autoHideAlert">
-        <ul class="mb-0">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+                <h6 class="fw-bold"><i class="fas fa-exclamation-triangle me-2"></i> Form Error:</h6>
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-<form action="{{ route('admin.books.store') }}" method="POST" enctype="multipart/form-data">
-        <form action="{{ route('admin.books.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('admin.books.update', $book->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
-            
-            <h5 class="fw-bold mb-4 text-primary border-bottom pb-2">Basic Information</h5>
+            @method('PUT') <h5 class="fw-bold mb-4 text-primary border-bottom pb-2">Basic Information</h5>
             <div class="row g-4 mb-4">
                 <div class="col-md-6">
                     <label class="form-label fw-bold">Book Title <span class="text-danger">*</span></label>
-                    <input type="text" name="title" class="form-control" required>
+                    <input type="text" name="title" class="form-control" value="{{ old('title', $book->title) }}" required>
                 </div>
                 
                 <div class="col-md-6">
@@ -33,7 +33,9 @@
                     <select name="author_id" class="form-select searchable-select" required>
                         <option value="">Select Author</option>
                         @foreach($authors as $author)
-                            <option value="{{ $author->id }}">{{ $author->name }}</option>
+                            <option value="{{ $author->id }}" {{ $book->author_id == $author->id ? 'selected' : '' }}>
+                                {{ $author->name }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
@@ -43,17 +45,19 @@
                     <select name="publisher_id" class="form-select searchable-select" required>
                         <option value="">Select Publisher</option>
                         @foreach($publishers as $publisher)
-                            <option value="{{ $publisher->id }}">{{ $publisher->name }}</option>
+                            <option value="{{ $publisher->id }}" {{ $book->publisher_id == $publisher->id ? 'selected' : '' }}>
+                                {{ $publisher->name }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-bold">ISBN-13 <span class="text-danger">*</span></label>
-                    <input type="text" name="isbn_13" class="form-control" required>
+                    <input type="text" name="isbn_13" class="form-control" value="{{ old('isbn_13', $book->isbn_13) }}" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-bold">Edition</label>
-                    <input type="text" name="edition" class="form-control">
+                    <input type="text" name="edition" class="form-control" value="{{ old('edition', $book->edition) }}">
                 </div>
             </div>
 
@@ -61,27 +65,27 @@
             <div class="row g-4 mb-4">
                 <div class="col-md-3">
                     <label class="form-label fw-bold">Published Date</label>
-                    <input type="date" name="published_date" class="form-control">
+                    <input type="date" name="published_date" class="form-control" value="{{ old('published_date', $book->published_date) }}">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label fw-bold">Binding <span class="text-danger">*</span></label>
                     <select name="binding" class="form-select" required>
-                        <option value="Paperback">Paperback</option>
-                        <option value="Hardbound">Hardbound</option>
-                        <option value="Spiral">Spiral</option>
+                        <option value="Paperback" {{ $book->binding == 'Paperback' ? 'selected' : '' }}>Paperback</option>
+                        <option value="Hardbound" {{ $book->binding == 'Hardbound' ? 'selected' : '' }}>Hardbound</option>
+                        <option value="Spiral" {{ $book->binding == 'Spiral' ? 'selected' : '' }}>Spiral</option>
                     </select>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label fw-bold">Price (₹) <span class="text-danger">*</span></label>
-                    <input type="number" step="0.01" name="price" class="form-control" required>
+                    <input type="number" step="0.01" name="price" class="form-control" value="{{ old('price', $book->price) }}" required>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label fw-bold">Stock Quantity <span class="text-danger">*</span></label>
-                    <input type="number" name="quantity" class="form-control" value="0" required>
+                    <input type="number" name="quantity" class="form-control" value="{{ old('quantity', $book->quantity) }}" required>
                 </div>
             </div>
 
-            <h5 class="fw-bold mb-4 text-primary border-bottom pb-2">Media & Description</h5>
+              <h5 class="fw-bold mb-4 text-primary border-bottom pb-2">Media & Description</h5>
 <div class="row g-4 mb-4">
     <div class="col-md-6">
         <label class="form-label fw-bold">Cover Image <span class="text-danger">*</span></label>
@@ -104,27 +108,27 @@
     </div>
 </div>
 
-            <div class="d-flex justify-content-end mt-4">
-                <button type="submit" class="btn btn-primary px-5 py-2 fw-bold"><i class="fas fa-save me-2"></i> Save Book</button>
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{{ route('admin.books.index') }}" class="btn btn-light shadow-sm fw-bold">Cancel</a>
+                <button type="submit" class="btn btn-warning px-5 py-2 fw-bold text-dark shadow-sm"><i class="fas fa-sync-alt me-2"></i> Update Book</button>
             </div>
         </form>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
 <script>
     $(document).ready(function() {
-
-        // 1. Select2 Initialize (Ye line add karni hai)
+        // Select2 Initialize
         $('.searchable-select').select2({
             placeholder: "Search and select...",
             allowClear: true,
             width: '100%'
         });
 
-
-
+        // Summernote Initialize
         $('#summernote').summernote({
             placeholder: 'Write a detailed description of the book...',
             tabsize: 2,
@@ -140,7 +144,7 @@
             ]
         });
 
-        // --- 1. Auto Hide Alert after 2 seconds ---
+         // --- 1. Auto Hide Alert after 2 seconds ---
         if ($('#autoHideAlert').length > 0) {
             setTimeout(function() {
                 $('#autoHideAlert').fadeOut('slow');

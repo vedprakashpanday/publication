@@ -6,16 +6,35 @@
 
 @section('content')
 <div class="card border-0 shadow-sm" style="border-radius: 15px;">
-    <div class="card-body p-5">
+    <div class="card-body ">
+        
+        @if ($errors->any())
+            <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-4 auto-hide-alert">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li><i class="fas fa-exclamation-triangle me-2"></i> {{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        @if(session('success'))
+            <div class="alert alert-success shadow-sm border-0 rounded-3 mb-4 auto-hide-alert">
+                <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+            </div>
+        @endif
+
         <form action="{{ route('admin.authors.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="row">
                 <div class="col-md-4 text-center border-end">
                     <label class="form-label d-block fw-bold">Author Profile Image</label>
-                    <div class="mb-3">
-                        <img id="preview" src="https://ui-avatars.com/api/?name=Author&size=150" class="rounded-circle shadow" width="150">
+                    <div class="mb-3 position-relative d-inline-block mt-2">
+                        <img id="profilePreview" src="https://ui-avatars.com/api/?name=Author&size=150" class="rounded-circle shadow" style="width: 150px; height: 150px; object-fit: cover;">
+                        
+                        <button type="button" class="btn btn-danger btn-sm position-absolute top-0 start-100 translate-middle rounded-circle shadow" id="removeProfileBtn" style="display: none; width: 30px; height: 30px; padding: 0; line-height: 1; font-size: 16px;">&times;</button>
                     </div>
-                    <input type="file" name="profile_image" class="form-control form-control-sm" onchange="document.getElementById('preview').src = window.URL.createObjectURL(this.files[0])">
+                    <input type="file" name="profile_image" id="profileInput" class="form-control form-control-sm" accept="image/*">
                 </div>
                 
                 <div class="col-md-8">
@@ -46,7 +65,7 @@
             </div>
 
             <div class="text-end mt-4">
-                <button type="submit" class="btn btn-primary px-5 btn-lg shadow-sm">Save Author Profile</button>
+                <button type="submit" class="btn btn-primary px-5 btn-lg shadow-sm"><i class="fas fa-save me-2"></i> Save Author Profile</button>
             </div>
         </form>
     </div>
@@ -55,7 +74,38 @@
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
 <script>
     $(document).ready(function() {
+        
+        // 1. Auto Hide Alerts after 2 seconds
+        if ($('.auto-hide-alert').length > 0) {
+            setTimeout(function() {
+                $('.auto-hide-alert').fadeOut('slow');
+            }, 2000);
+        }
+
+        // 2. Summernote Initialization
         $('#summernote').summernote({ height: 200, tabsize: 2 });
+
+        // 3. Profile Image Preview & Remove Logic
+        const defaultAvatar = "https://ui-avatars.com/api/?name=Author&size=150";
+
+        $('#profileInput').on('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    $('#profilePreview').attr('src', event.target.result); // Show selected image
+                    $('#removeProfileBtn').fadeIn(); // Show 'X' button
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        $('#removeProfileBtn').on('click', function() {
+            $('#profileInput').val(''); // Clear the file input
+            $('#profilePreview').attr('src', defaultAvatar); // Revert to default avatar
+            $(this).fadeOut(); // Hide the 'X' button
+        });
+
     });
 </script>
 @endsection
