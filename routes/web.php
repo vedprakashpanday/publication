@@ -22,7 +22,27 @@ use App\Http\Controllers\Admin\SettingController;
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
-    return view('welcome');
+    return view('frontend.home');
+});
+
+Route::get('/book', function () {
+    return view('frontend.book-details'); // File ka naam jo aapne save kiya hai
+});
+
+Route::get('/shop', function () {
+    return view('frontend.shop'); 
+});
+
+Route::get('/cart', function () {
+    return view('frontend.cart'); 
+});
+
+Route::get('/checkout', function () {
+    return view('frontend.checkout'); 
+});
+
+Route::get('/udashboard', function () {
+    return view('frontend.user-dashboard'); 
 });
 
 Auth::routes();

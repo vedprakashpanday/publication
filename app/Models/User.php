@@ -20,6 +20,7 @@ class User extends Authenticatable
         'role', 
         'seller_type', // Naya add kiya
         'shop_name',   // Naya add kiya
+        'profile_image', 
     ];
 
     protected $hidden = [
