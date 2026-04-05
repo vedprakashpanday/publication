@@ -16,14 +16,14 @@ class LoginController extends Controller
         if ($user->role === 'admin') {
             return redirect()->route('admin.dashboard');
         } 
-        
+           
         // Agar Seller login karta hai
         elseif ($user->role === 'seller') {
             return redirect()->route('seller.dashboard'); // Ye route hum aage banayenge
         }
 
         // Agar aam User login karta hai
-        return redirect('/home'); // Ya jo bhi aapke website ka front page ho
+        return redirect('/'); // Ya jo bhi aapke website ka front page ho
     }
 
     public function __construct()

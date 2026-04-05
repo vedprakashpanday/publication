@@ -107,7 +107,7 @@
             <div class="carousel-caption d-none d-md-block">
                 <h2>Bestselling Literature</h2>
                 <p>Discover the stories everyone is talking about this month.</p>
-                <a href="#" class="btn btn-accent mt-2">Shop Now</a>
+                <a href="{{ route('shop') }}" class="btn btn-accent mt-2">Shop Now</a>
             </div>
         </div>
         <div class="carousel-item">
@@ -154,66 +154,31 @@
                 <span class="text-uppercase fw-bold small text-muted letter-spacing">Fresh off the press</span>
                 <h2 class="mb-0">New Arrivals</h2>
             </div>
-            <a href="#" class="btn btn-outline-dark btn-sm rounded-pill px-3 d-none d-md-block">View All</a>
+            <a href="{{ route('shop') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3 d-none d-md-block">View All</a>
         </div>
 
         <div class="row g-3 g-md-4">
-            <div class="col-6 col-md-4 col-lg-3">
+            @foreach($newArrivals as $book)
+            <div class="col-6 col-md-4 col-lg-3 {{ $loop->iteration == 4 ? 'd-none d-md-block' : '' }}">
                 <div class="book-card">
-                    <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=600&auto=format&fit=crop" class="book-cover" alt="Book Cover">
+                    @php $frontImage = $book->images->where('image_type', 'front')->first(); @endphp
+                    <img src="{{ $frontImage ? asset('storage/'.$frontImage->image_path) : 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=600&auto=format&fit=crop' }}" class="book-cover" alt="{{ $book->title }}">
+                    
                     <div class="p-3 d-flex flex-column flex-grow-1">
-                        <h3 class="book-title">The Art of Storytelling</h3>
-                        <p class="book-author">Ved Prakash Panday</p>
+                        <h3 class="book-title">{{ $book->title }}</h3>
+                        <p class="book-author">{{ $book->author->name ?? 'Unknown Author' }}</p>
                         <div class="mt-auto d-flex justify-content-between align-items-center">
-                            <span class="book-price">₹299</span>
+                            <span class="book-price">₹{{ $book->price }}</span>
                             <button class="btn btn-accent btn-sm rounded-circle shadow-sm" title="Add to Cart"><i class="fas fa-cart-plus"></i></button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-6 col-md-4 col-lg-3">
-                <div class="book-card">
-                    <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=600&auto=format&fit=crop" class="book-cover" alt="Book Cover">
-                    <div class="p-3 d-flex flex-column flex-grow-1">
-                        <h3 class="book-title">Ghazals of the Night</h3>
-                        <p class="book-author">Aman Verma</p>
-                        <div class="mt-auto d-flex justify-content-between align-items-center">
-                            <span class="book-price">₹199</span>
-                            <button class="btn btn-accent btn-sm rounded-circle shadow-sm" title="Add to Cart"><i class="fas fa-cart-plus"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-4 col-lg-3">
-                <div class="book-card">
-                    <img src="https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=600&auto=format&fit=crop" class="book-cover" alt="Book Cover">
-                    <div class="p-3 d-flex flex-column flex-grow-1">
-                        <h3 class="book-title">Modern Web Development</h3>
-                        <p class="book-author">Tech Experts</p>
-                        <div class="mt-auto d-flex justify-content-between align-items-center">
-                            <span class="book-price">₹450</span>
-                            <button class="btn btn-accent btn-sm rounded-circle shadow-sm" title="Add to Cart"><i class="fas fa-cart-plus"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-4 col-lg-3 d-none d-md-block">
-                <div class="book-card">
-                    <img src="https://images.unsplash.com/photo-1618666012174-83b441c0bc76?q=80&w=600&auto=format&fit=crop" class="book-cover" alt="Book Cover">
-                    <div class="p-3 d-flex flex-column flex-grow-1">
-                        <h3 class="book-title">Echoes of the Past</h3>
-                        <p class="book-author">Ravi Sharma</p>
-                        <div class="mt-auto d-flex justify-content-between align-items-center">
-                            <span class="book-price">₹350</span>
-                            <button class="btn btn-accent btn-sm rounded-circle shadow-sm" title="Add to Cart"><i class="fas fa-cart-plus"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
         
         <div class="text-center mt-4 d-md-none">
-            <a href="#" class="btn btn-outline-dark rounded-pill px-4 w-100">View All Arrivals</a>
+            <a href="{{ route('shop') }}" class="btn btn-outline-dark rounded-pill px-4 w-100">View All Arrivals</a>
         </div>
     </div>
 </section>
@@ -225,31 +190,20 @@
                 <span class="badge bg-warning text-dark mb-2 px-3 py-2 rounded-pill fw-bold">Divyansh Originals</span>
                 <h2 class="display-5 fw-bold text-white mb-3 mt-2">Only on Divyansh</h2>
                 <p class="text-light opacity-75 mb-4 px-3 px-lg-0">Discover literary gems published exclusively by us. Unedited, unfiltered, and deeply original content that you won't find anywhere else.</p>
-                <a href="#" class="btn btn-accent rounded-pill px-4 py-2">View Exclusive Collection</a>
+                <a href="{{ route('shop') }}" class="btn btn-accent rounded-pill px-4 py-2">View Exclusive Collection</a>
             </div>
             <div class="col-lg-7">
                 <div class="row g-3 justify-content-center">
-                    <div class="col-5 col-md-4">
+                    @foreach($exclusiveBooks as $book)
+                    <div class="col-5 col-md-4 {{ $loop->iteration == 3 ? 'd-none d-md-block' : '' }}">
                         <div class="book-card border-0 bg-transparent text-white text-center" style="box-shadow: none;">
-                            <img src="https://images.unsplash.com/photo-1476275466078-4007374efbbe?q=80&w=400&auto=format&fit=crop" class="book-cover rounded-3 shadow-lg mb-2" alt="Exclusive" style="border: 2px solid #334155;">
-                            <h3 class="book-title text-white fs-6 mb-0">The Hidden Truth</h3>
-                            <span class="text-warning fw-bold small">₹499</span>
+                            @php $frontImage = $book->images->where('image_type', 'front')->first(); @endphp
+                            <img src="{{ $frontImage ? asset('storage/'.$frontImage->image_path) : 'https://images.unsplash.com/photo-1476275466078-4007374efbbe?q=80&w=400&auto=format&fit=crop' }}" class="book-cover rounded-3 shadow-lg mb-2" alt="{{ $book->title }}" style="border: 2px solid #334155;">
+                            <h3 class="book-title text-white fs-6 mb-0">{{ $book->title }}</h3>
+                            <span class="text-warning fw-bold small">₹{{ $book->price }}</span>
                         </div>
                     </div>
-                    <div class="col-5 col-md-4">
-                        <div class="book-card border-0 bg-transparent text-white text-center" style="box-shadow: none;">
-                            <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=400&auto=format&fit=crop" class="book-cover rounded-3 shadow-lg mb-2" alt="Exclusive" style="border: 2px solid #334155;">
-                            <h3 class="book-title text-white fs-6 mb-0">Roots of India</h3>
-                            <span class="text-warning fw-bold small">₹550</span>
-                        </div>
-                    </div>
-                    <div class="col-5 col-md-4 d-none d-md-block">
-                        <div class="book-card border-0 bg-transparent text-white text-center" style="box-shadow: none;">
-                            <img src="https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=400&auto=format&fit=crop" class="book-cover rounded-3 shadow-lg mb-2" alt="Exclusive" style="border: 2px solid #334155;">
-                            <h3 class="book-title text-white fs-6 mb-0">Silent Echoes</h3>
-                            <span class="text-warning fw-bold small">₹320</span>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -264,34 +218,15 @@
         </div>
 
         <div class="row g-4 justify-content-center">
+            @foreach($topAuthors as $author)
             <div class="col-6 col-md-3 col-lg-2">
                 <div class="author-circle-wrapper">
-                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop" class="rounded-circle author-img mb-3">
-                    <h5 class="fw-bold fs-6 text-dark mb-0">Ved Prakash Panday</h5>
-                    <small class="text-muted">Fiction</small>
+                    <img src="{{ $author->profile_image ? asset('storage/'.$author->profile_image) : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop' }}" class="rounded-circle author-img mb-3" alt="{{ $author->name }}">
+                    <h5 class="fw-bold fs-6 text-dark mb-0">{{ $author->name }}</h5>
+                    <small class="text-muted">Author</small>
                 </div>
             </div>
-            <div class="col-6 col-md-3 col-lg-2">
-                <div class="author-circle-wrapper">
-                    <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=200&auto=format&fit=crop" class="rounded-circle author-img mb-3">
-                    <h5 class="fw-bold fs-6 text-dark mb-0">Aditi Sharma</h5>
-                    <small class="text-muted">Poetry</small>
-                </div>
-            </div>
-            <div class="col-6 col-md-3 col-lg-2">
-                <div class="author-circle-wrapper">
-                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop" class="rounded-circle author-img mb-3">
-                    <h5 class="fw-bold fs-6 text-dark mb-0">Ravi Shankar</h5>
-                    <small class="text-muted">History</small>
-                </div>
-            </div>
-            <div class="col-6 col-md-3 col-lg-2">
-                <div class="author-circle-wrapper">
-                    <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop" class="rounded-circle author-img mb-3">
-                    <h5 class="fw-bold fs-6 text-dark mb-0">Priya Singh</h5>
-                    <small class="text-muted">Romance</small>
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 </section>
@@ -304,58 +239,22 @@
         </div>
 
         <div class="row g-3 g-md-4">
-            <div class="col-6 col-md-4 col-lg-3">
+            @foreach($booksByTopAuthors as $book)
+            <div class="col-6 col-md-4 col-lg-3 {{ $loop->iteration == 4 ? 'd-none d-md-block' : '' }}">
                 <div class="book-card border-0 shadow-sm">
-                    <span class="badge bg-dark position-absolute m-2">By Ved Prakash</span>
-                    <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=600&auto=format&fit=crop" class="book-cover" alt="Book Cover">
+                    <span class="badge bg-dark position-absolute m-2">By {{ explode(' ', trim($book->author->name ?? 'Unknown'))[0] }}</span>
+                    @php $frontImage = $book->images->where('image_type', 'front')->first(); @endphp
+                    <img src="{{ $frontImage ? asset('storage/'.$frontImage->image_path) : 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=600&auto=format&fit=crop' }}" class="book-cover" alt="{{ $book->title }}">
                     <div class="p-3">
-                        <h3 class="book-title">The Grand Journey</h3>
+                        <h3 class="book-title">{{ $book->title }}</h3>
                         <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="book-price">₹399</span>
+                            <span class="book-price">₹{{ $book->price }}</span>
                             <button class="btn btn-outline-primary btn-sm rounded-circle"><i class="fas fa-cart-plus"></i></button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-6 col-md-4 col-lg-3">
-                <div class="book-card border-0 shadow-sm">
-                    <span class="badge bg-dark position-absolute m-2">By Aditi Sharma</span>
-                    <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=600&auto=format&fit=crop" class="book-cover" alt="Book Cover">
-                    <div class="p-3">
-                        <h3 class="book-title">Midnight Ghazals</h3>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="book-price">₹250</span>
-                            <button class="btn btn-outline-primary btn-sm rounded-circle"><i class="fas fa-cart-plus"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-4 col-lg-3">
-                <div class="book-card border-0 shadow-sm">
-                    <span class="badge bg-dark position-absolute m-2">By Ravi Shankar</span>
-                    <img src="https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=600&auto=format&fit=crop" class="book-cover" alt="Book Cover">
-                    <div class="p-3">
-                        <h3 class="book-title">Ancient Kingdoms</h3>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="book-price">₹450</span>
-                            <button class="btn btn-outline-primary btn-sm rounded-circle"><i class="fas fa-cart-plus"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-4 col-lg-3 d-none d-md-block">
-                <div class="book-card border-0 shadow-sm">
-                    <span class="badge bg-dark position-absolute m-2">By Priya Singh</span>
-                    <img src="https://images.unsplash.com/photo-1618666012174-83b441c0bc76?q=80&w=600&auto=format&fit=crop" class="book-cover" alt="Book Cover">
-                    <div class="p-3">
-                        <h3 class="book-title">Love in the City</h3>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="book-price">₹299</span>
-                            <button class="btn btn-outline-primary btn-sm rounded-circle"><i class="fas fa-cart-plus"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 </section>
@@ -370,38 +269,22 @@
         </div>
 
         <div class="row g-3 g-md-4">
-            <div class="col-6 col-md-3">
+            @foreach($topRatedBooks as $book)
+            <div class="col-6 col-md-3 {{ $loop->iteration > 2 ? 'd-none d-md-block' : '' }}">
                 <div class="book-card border-0 shadow-sm bg-light text-center p-2">
-                    <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=600&auto=format&fit=crop" class="book-cover rounded-3 mb-2" alt="Book">
-                    <div class="text-warning small mb-1"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
-                    <h3 class="book-title fs-6">Ghazals of the Night</h3>
-                    <span class="book-price d-block mt-2">₹199</span>
+                    @php $frontImage = $book->images->where('image_type', 'front')->first(); @endphp
+                    <img src="{{ $frontImage ? asset('storage/'.$frontImage->image_path) : 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=600&auto=format&fit=crop' }}" class="book-cover rounded-3 mb-2" alt="{{ $book->title }}">
+                    
+                    <div class="text-warning small mb-1">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        @if($loop->iteration % 2 == 0) <i class="fas fa-star"></i> @else <i class="fas fa-star-half-alt"></i> @endif
+                    </div>
+                    
+                    <h3 class="book-title fs-6">{{ $book->title }}</h3>
+                    <span class="book-price d-block mt-2">₹{{ $book->price }}</span>
                 </div>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="book-card border-0 shadow-sm bg-light text-center p-2">
-                    <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=600&auto=format&fit=crop" class="book-cover rounded-3 mb-2" alt="Book">
-                    <div class="text-warning small mb-1"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    <h3 class="book-title fs-6">The Art of Storytelling</h3>
-                    <span class="book-price d-block mt-2">₹299</span>
-                </div>
-            </div>
-            <div class="col-6 col-md-3 d-none d-md-block">
-                <div class="book-card border-0 shadow-sm bg-light text-center p-2">
-                    <img src="https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=600&auto=format&fit=crop" class="book-cover rounded-3 mb-2" alt="Book">
-                    <div class="text-warning small mb-1"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div>
-                    <h3 class="book-title fs-6">Modern Web Dev</h3>
-                    <span class="book-price d-block mt-2">₹450</span>
-                </div>
-            </div>
-            <div class="col-6 col-md-3 d-none d-md-block">
-                <div class="book-card border-0 shadow-sm bg-light text-center p-2">
-                    <img src="https://images.unsplash.com/photo-1618666012174-83b441c0bc76?q=80&w=600&auto=format&fit=crop" class="book-cover rounded-3 mb-2" alt="Book">
-                    <div class="text-warning small mb-1"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
-                    <h3 class="book-title fs-6">Echoes of the Past</h3>
-                    <span class="book-price d-block mt-2">₹350</span>
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 </section>
@@ -416,62 +299,23 @@
         </div>
 
         <div class="row g-3 g-md-4">
-            <div class="col-6 col-md-4 col-lg-3">
+            @foreach($trendingBooks as $book)
+            <div class="col-6 col-md-4 col-lg-3 {{ $loop->iteration > 2 ? 'd-none d-md-block' : '' }}">
                 <div class="book-card border-0 shadow-sm">
                     <div class="position-absolute bg-danger text-white small px-2 py-1 m-2 rounded shadow-sm"><i class="fas fa-fire me-1"></i> Trending</div>
-                    <img src="https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=600&auto=format&fit=crop" class="book-cover" alt="Trending">
+                    @php $frontImage = $book->images->where('image_type', 'front')->first(); @endphp
+                    <img src="{{ $frontImage ? asset('storage/'.$frontImage->image_path) : 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=600&auto=format&fit=crop' }}" class="book-cover" alt="{{ $book->title }}">
                     <div class="p-3">
-                        <h3 class="book-title">Silent Echoes</h3>
-                        <p class="book-author">Thousands reading now</p>
+                        <h3 class="book-title">{{ $book->title }}</h3>
+                        <p class="book-author">{{ $loop->iteration == 1 ? 'Thousands reading now' : 'Highly Demanded' }}</p>
                         <div class="d-flex justify-content-between align-items-center mt-auto">
-                            <span class="book-price">₹320</span>
+                            <span class="book-price">₹{{ $book->price }}</span>
                             <button class="btn btn-accent btn-sm rounded-circle"><i class="fas fa-cart-plus"></i></button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-6 col-md-4 col-lg-3">
-                <div class="book-card border-0 shadow-sm">
-                    <div class="position-absolute bg-danger text-white small px-2 py-1 m-2 rounded shadow-sm"><i class="fas fa-fire me-1"></i> Trending</div>
-                    <img src="https://images.unsplash.com/photo-1476275466078-4007374efbbe?q=80&w=600&auto=format&fit=crop" class="book-cover" alt="Trending">
-                    <div class="p-3">
-                        <h3 class="book-title">The Hidden Truth</h3>
-                        <p class="book-author">Best Seller of the Month</p>
-                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                            <span class="book-price">₹499</span>
-                            <button class="btn btn-accent btn-sm rounded-circle"><i class="fas fa-cart-plus"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-             <div class="col-6 col-md-4 col-lg-3 d-none d-md-block">
-                <div class="book-card border-0 shadow-sm">
-                    <div class="position-absolute bg-danger text-white small px-2 py-1 m-2 rounded shadow-sm"><i class="fas fa-fire me-1"></i> Trending</div>
-                    <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=600&auto=format&fit=crop" class="book-cover" alt="Trending">
-                    <div class="p-3">
-                        <h3 class="book-title">Art of Storytelling</h3>
-                        <p class="book-author">Highly Demanded</p>
-                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                            <span class="book-price">₹299</span>
-                            <button class="btn btn-accent btn-sm rounded-circle"><i class="fas fa-cart-plus"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-             <div class="col-6 col-md-4 col-lg-3 d-none d-md-block">
-                <div class="book-card border-0 shadow-sm">
-                    <div class="position-absolute bg-danger text-white small px-2 py-1 m-2 rounded shadow-sm"><i class="fas fa-fire me-1"></i> Trending</div>
-                    <img src="https://images.unsplash.com/photo-1618666012174-83b441c0bc76?q=80&w=600&auto=format&fit=crop" class="book-cover" alt="Trending">
-                    <div class="p-3">
-                        <h3 class="book-title">Echoes of the Past</h3>
-                        <p class="book-author">Classic Must Read</p>
-                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                            <span class="book-price">₹350</span>
-                            <button class="btn btn-accent btn-sm rounded-circle"><i class="fas fa-cart-plus"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 </section>

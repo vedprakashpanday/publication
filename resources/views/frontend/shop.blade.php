@@ -36,7 +36,9 @@
     .book-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.1rem; color: var(--primary-color); margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .book-author { font-size: 0.85rem; color: #64748b; margin-bottom: 10px; }
     .book-price { font-weight: 600; color: var(--accent-color); font-size: 1.1rem; }
-    .btn-cart-circle { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; background: var(--accent-color); color: white; border: none; transition: 0.3s; }
+    
+    /* CART BUTTON UPDATE */
+    .btn-cart-circle { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; background: var(--accent-color); color: white; border: none; transition: 0.3s; z-index: 2; position: relative; }
     .btn-cart-circle:hover { background: #b45309; transform: scale(1.1); }
 
     .pagination .page-link { color: #475569; border: 1px solid #e2e8f0; margin: 0 3px; border-radius: 8px; font-weight: 600; transition: 0.2s; }
@@ -75,48 +77,48 @@
         <div class="row g-4">
             
             <div class="col-lg-3 filter-sidebar">
-                <div class="search-box mb-4">
-                    <i class="fas fa-search"></i>
-                    <input type="text" class="form-control py-2" placeholder="Search books...">
-                </div>
+                <form action="{{ route('shop') }}" method="GET" id="desktopFilterForm">
+                    <input type="hidden" name="sort" value="{{ request('sort', 'latest') }}" id="desktopSortHidden">
 
-                <div class="filter-card">
-                    <h4 class="filter-title">Categories</h4>
-                    <div class="form-check custom-checkbox mb-2">
-                        <input class="form-check-input" type="checkbox" value="" id="cat1" checked>
-                        <label class="form-check-label w-100" for="cat1">Literature & Fiction <span class="filter-count">(42)</span></label>
+                    <div class="search-box mb-4">
+                        <i class="fas fa-search"></i>
+                        <input type="text" name="search" class="form-control py-2" placeholder="Search books..." value="{{ request('search') }}">
                     </div>
-                    <div class="form-check custom-checkbox mb-2">
-                        <input class="form-check-input" type="checkbox" value="" id="cat2">
-                        <label class="form-check-label w-100" for="cat2">Poetry & Ghazals <span class="filter-count">(18)</span></label>
-                    </div>
-                    <div class="form-check custom-checkbox mb-2">
-                        <input class="form-check-input" type="checkbox" value="" id="cat3">
-                        <label class="form-check-label w-100" for="cat3">Self-Help <span class="filter-count">(30)</span></label>
-                    </div>
-                </div>
 
-                <div class="filter-card">
-                    <h4 class="filter-title">Price Range</h4>
-                    <div class="row g-2 align-items-center">
-                        <div class="col-5"><input type="number" class="price-input" placeholder="Min" value="99"></div>
-                        <div class="col-2 text-center text-muted fw-bold">-</div>
-                        <div class="col-5"><input type="number" class="price-input" placeholder="Max" value="999"></div>
+                    <div class="filter-card">
+                        <h4 class="filter-title">Categories</h4>
+                        @foreach($categories as $category)
+                        <div class="form-check custom-checkbox mb-2">
+                            <input class="form-check-input" type="checkbox" name="categories[]" value="{{ $category->id }}" id="cat{{ $category->id }}" @checked(is_array(request('categories')) && in_array($category->id, request('categories')))>
+                            <label class="form-check-label w-100" for="cat{{ $category->id }}">
+                                {{ $category->name }} <span class="filter-count">({{ $category->books_count ?? 0 }})</span>
+                            </label>
+                        </div>
+                        @endforeach
                     </div>
-                    <button class="btn btn-dark w-100 mt-3 rounded-pill btn-sm fw-bold">Apply Filter</button>
-                </div>
 
-                <div class="filter-card">
-                    <h4 class="filter-title">Authors</h4>
-                    <div class="form-check custom-checkbox mb-2">
-                        <input class="form-check-input" type="checkbox" value="" id="auth1">
-                        <label class="form-check-label w-100" for="auth1">Ved Prakash Panday <span class="filter-count">(5)</span></label>
+                    <div class="filter-card">
+                        <h4 class="filter-title">Price Range</h4>
+                        <div class="row g-2 align-items-center">
+                            <div class="col-5"><input type="number" name="min_price" class="price-input" placeholder="Min" value="{{ request('min_price', 99) }}"></div>
+                            <div class="col-2 text-center text-muted fw-bold">-</div>
+                            <div class="col-5"><input type="number" name="max_price" class="price-input" placeholder="Max" value="{{ request('max_price', 1999) }}"></div>
+                        </div>
+                        <button type="submit" class="btn btn-dark w-100 mt-3 rounded-pill btn-sm fw-bold">Apply Filter</button>
                     </div>
-                    <div class="form-check custom-checkbox mb-2">
-                        <input class="form-check-input" type="checkbox" value="" id="auth2">
-                        <label class="form-check-label w-100" for="auth2">Aditi Sharma <span class="filter-count">(3)</span></label>
+
+                    <div class="filter-card">
+                        <h4 class="filter-title">Authors</h4>
+                        @foreach($authors as $author)
+                        <div class="form-check custom-checkbox mb-2">
+                            <input class="form-check-input" type="checkbox" name="authors[]" value="{{ $author->id }}" id="auth{{ $author->id }}" @checked(is_array(request('authors')) && in_array($author->id, request('authors')))>
+                            <label class="form-check-label w-100" for="auth{{ $author->id }}">
+                                {{ $author->name }} <span class="filter-count">({{ $author->books_count ?? 0 }})</span>
+                            </label>
+                        </div>
+                        @endforeach
                     </div>
-                </div>
+                </form>
             </div>
 
             <div class="col-lg-9">
@@ -124,7 +126,7 @@
                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom">
                     
                     <div class="d-none d-md-block text-dark font-playfair fs-5 fw-bold">
-                        Showing <span class="text-accent">1–12</span> of 129 Books
+                        Showing <span class="text-accent">{{ $books->firstItem() ?? 0 }}–{{ $books->lastItem() ?? 0 }}</span> of {{ $books->total() }} Books
                     </div>
 
                     <div class="d-flex d-md-none w-100 bg-white rounded-pill shadow-sm border p-1 mb-2">
@@ -134,10 +136,10 @@
                         
                         <div class="w-50 position-relative d-flex align-items-center justify-content-center bg-white rounded-end-pill px-2">
                             <i class="fas fa-sort-amount-down me-1 text-muted small"></i>
-                            <select class="form-select form-select-sm shadow-none border-0 bg-transparent fw-bold text-dark w-100 px-0" style="cursor: pointer; text-overflow: ellipsis;">
-                                <option value="latest">Latest</option>
-                                <option value="price_low">Low to High</option>
-                                <option value="price_high">High to Low</option>
+                            <select class="form-select form-select-sm shadow-none border-0 bg-transparent fw-bold text-dark w-100 px-0" style="cursor: pointer; text-overflow: ellipsis;" onchange="document.getElementById('mobileSortHidden').value = this.value; document.getElementById('mobileFilterForm').submit();">
+                                <option value="latest" @selected(request('sort') == 'latest')>Latest</option>
+                                <option value="price_low" @selected(request('sort') == 'price_low')>Low to High</option>
+                                <option value="price_high" @selected(request('sort') == 'price_high')>High to Low</option>
                             </select>
                         </div>
                     </div>
@@ -145,100 +147,88 @@
                     <div class="d-none d-md-flex align-items-center">
                         <span class="text-muted small fw-bold me-3">Sort by:</span>
                         <div class="desktop-sort-wrapper">
-                            <select class="form-select shadow-none border-0 fw-bold text-dark bg-transparent ps-2 pe-4" style="cursor: pointer;">
-                                <option value="latest">Latest Arrivals</option>
-                                <option value="price_low">Price: Low to High</option>
-                                <option value="price_high">Price: High to Low</option>
-                                <option value="rating">Top Rated</option>
+                            <select class="form-select shadow-none border-0 fw-bold text-dark bg-transparent ps-2 pe-4" style="cursor: pointer;" onchange="document.getElementById('desktopSortHidden').value = this.value; document.getElementById('desktopFilterForm').submit();">
+                                <option value="latest" @selected(request('sort') == 'latest')>Latest Arrivals</option>
+                                <option value="price_low" @selected(request('sort') == 'price_low')>Price: Low to High</option>
+                                <option value="price_high" @selected(request('sort') == 'price_high')>Price: High to Low</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
                 <div class="row g-3 g-md-4">
+                    @forelse($books as $book)
                     <div class="col-6 col-md-4">
                         <div class="book-card">
-                            <a href="#" class="text-decoration-none text-dark">
-                                <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=600&auto=format&fit=crop" class="book-cover" alt="Book">
+                            <a href="{{ route('book.show', $book->id) }}" class="text-decoration-none text-dark">
+                                @if($book->mrp > $book->price)
+                                    <span class="badge bg-danger position-absolute m-2" style="z-index: 1;">Sale</span>
+                                @endif
+                                
+                                @php $frontImage = $book->images->where('image_type', 'front')->first(); @endphp
+                                <img src="{{ $frontImage ? asset('storage/'.$frontImage->image_path) : 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=600&auto=format&fit=crop' }}" class="book-cover" alt="{{ $book->title }}">
+                                
                                 <div class="p-3 d-flex flex-column flex-grow-1">
-                                    <h3 class="book-title">The Art of Storytelling</h3>
-                                    <p class="book-author">Ved Prakash Panday</p>
-                                    <div class="mt-auto d-flex justify-content-between align-items-center">
-                                        <span class="book-price">₹299</span>
-                                        <button class="btn-cart-circle shadow-sm" onclick="event.preventDefault();"><i class="fas fa-cart-plus"></i></button>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <div class="col-6 col-md-4">
-                        <div class="book-card">
-                            <a href="#" class="text-decoration-none text-dark">
-                                <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=600&auto=format&fit=crop" class="book-cover" alt="Book">
-                                <div class="p-3 d-flex flex-column flex-grow-1">
-                                    <h3 class="book-title">Ghazals of the Night</h3>
-                                    <p class="book-author">Aman Verma</p>
-                                    <div class="mt-auto d-flex justify-content-between align-items-center">
-                                        <span class="book-price">₹199</span>
-                                        <button class="btn-cart-circle shadow-sm" onclick="event.preventDefault();"><i class="fas fa-cart-plus"></i></button>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="col-6 col-md-4">
-                        <div class="book-card">
-                            <a href="#" class="text-decoration-none text-dark">
-                                <span class="badge bg-danger position-absolute m-2" style="z-index: 1;">Sale</span>
-                                <img src="https://images.unsplash.com/photo-1476275466078-4007374efbbe?q=80&w=600&auto=format&fit=crop" class="book-cover" alt="Book">
-                                <div class="p-3 d-flex flex-column flex-grow-1">
-                                    <h3 class="book-title">The Hidden Truth</h3>
-                                    <p class="book-author">Divyansh Exclusives</p>
+                                    <h3 class="book-title">{{ $book->title }}</h3>
+                                    <p class="book-author">{{ $book->author->name ?? 'Unknown Author' }}</p>
+                                    
                                     <div class="mt-auto d-flex justify-content-between align-items-center">
                                         <div>
-                                            <span class="book-price">₹499</span>
-                                            <small class="text-muted text-decoration-line-through ms-1">₹699</small>
+                                            <span class="book-price">₹{{ $book->price }}</span>
+                                            @if($book->mrp > $book->price)
+                                                <small class="text-muted text-decoration-line-through ms-1">₹{{ $book->mrp }}</small>
+                                            @endif
                                         </div>
-                                        <button class="btn-cart-circle shadow-sm" onclick="event.preventDefault();"><i class="fas fa-cart-plus"></i></button>
+                                        <button class="btn-cart-circle shadow-sm add-to-cart-btn" data-id="{{ $book->id }}">
+                                            <i class="fas fa-cart-plus"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </a>
                         </div>
                     </div>
-
-                    <div class="col-6 col-md-4">
-                        <div class="book-card">
-                            <a href="#" class="text-decoration-none text-dark">
-                                <img src="https://images.unsplash.com/photo-1618666012174-83b441c0bc76?q=80&w=600&auto=format&fit=crop" class="book-cover" alt="Book">
-                                <div class="p-3 d-flex flex-column flex-grow-1">
-                                    <h3 class="book-title">Echoes of the Past</h3>
-                                    <p class="book-author">Ravi Sharma</p>
-                                    <div class="mt-auto d-flex justify-content-between align-items-center">
-                                        <span class="book-price">₹350</span>
-                                        <button class="btn-cart-circle shadow-sm" onclick="event.preventDefault();"><i class="fas fa-cart-plus"></i></button>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
+                    @empty
+                    <div class="col-12 text-center py-5">
+                        <h4 class="text-muted fw-bold mb-3">No books found!</h4>
+                        <p class="text-muted">Try adjusting your filters or search criteria.</p>
+                        <a href="{{ route('shop') }}" class="btn btn-dark rounded-pill px-4">Clear All Filters</a>
                     </div>
+                    @endforelse
                 </div>
 
+                @if ($books->hasPages())
                 <nav class="mt-5 d-none d-md-block" aria-label="Page navigation">
                     <ul class="pagination justify-content-center">
-                        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"><i class="fas fa-chevron-left"></i></a></li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a></li>
+                        @if ($books->onFirstPage())
+                            <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"><i class="fas fa-chevron-left"></i></a></li>
+                        @else
+                            <li class="page-item"><a class="page-link" href="{{ $books->previousPageUrl() }}"><i class="fas fa-chevron-left"></i></a></li>
+                        @endif
+
+                        @foreach ($books->links()->elements[0] ?? [] as $page => $url)
+                            @if ($page == $books->currentPage())
+                                <li class="page-item active"><a class="page-link" href="#">{{ $page }}</a></li>
+                            @else
+                                <li class="page-item"><a class="page-link" href="{{ $url }}">{{ $page }}</a></li>
+                            @endif
+                        @endforeach
+
+                        @if ($books->hasMorePages())
+                            <li class="page-item"><a class="page-link" href="{{ $books->nextPageUrl() }}"><i class="fas fa-chevron-right"></i></a></li>
+                        @else
+                            <li class="page-item disabled"><a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a></li>
+                        @endif
                     </ul>
                 </nav>
+                @endif
 
+                @if ($books->hasMorePages())
                 <div class="text-center mt-4 d-md-none">
-                    <button class="btn btn-outline-dark rounded-pill px-5 py-2 fw-bold shadow-sm w-100">
+                    <a href="{{ $books->nextPageUrl() }}" class="btn btn-outline-dark rounded-pill px-5 py-2 fw-bold shadow-sm w-100">
                         Load More Books <i class="fas fa-sync-alt ms-2"></i>
-                    </button>
+                    </a>
                 </div>
+                @endif
 
             </div>
         </div>
@@ -250,109 +240,144 @@
         <h3 class="fw-bold font-playfair mb-4 text-dark text-center text-md-start">You Might Also Like</h3>
         
         <div class="row g-3 g-md-4">
-            <div class="col-6 col-md-3">
+            @foreach(\App\Models\Book::inRandomOrder()->take(4)->get() as $relatedBook)
+            <div class="col-6 col-md-3 {{ $loop->iteration > 2 ? 'd-none d-md-block' : '' }}">
                 <div class="book-card border-0 shadow-sm">
-                    <a href="#" class="text-decoration-none text-dark">
-                        <img src="https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=600&auto=format&fit=crop" class="book-cover" alt="Book">
+                    <a href="{{ route('book.show', $relatedBook->id) }}" class="text-decoration-none text-dark">
+                        @php $frontImg = $relatedBook->images->where('image_type', 'front')->first(); @endphp
+                        <img src="{{ $frontImg ? asset('storage/'.$frontImg->image_path) : 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=600&auto=format&fit=crop' }}" class="book-cover" alt="Book">
                         <div class="p-3">
-                            <h3 class="book-title fs-6">Modern Web Dev</h3>
-                            <p class="book-author mb-1 small">Tech Experts</p>
-                            <span class="book-price fs-6">₹450</span>
+                            <h3 class="book-title fs-6">{{ $relatedBook->title }}</h3>
+                            <p class="book-author mb-1 small">{{ $relatedBook->author->name ?? 'Unknown' }}</p>
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <span class="book-price fs-6">₹{{ $relatedBook->price }}</span>
+                                <button class="btn-cart-circle shadow-sm add-to-cart-btn" data-id="{{ $relatedBook->id }}">
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                            </div>
                         </div>
                     </a>
                 </div>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="book-card border-0 shadow-sm">
-                    <a href="#" class="text-decoration-none text-dark">
-                        <img src="https://images.unsplash.com/photo-1457369804613-52c61a468e7d?q=80&w=600&auto=format&fit=crop" class="book-cover" alt="Book">
-                        <div class="p-3">
-                            <h3 class="book-title fs-6">Silent Echoes</h3>
-                            <p class="book-author mb-1 small">Aditi Sharma</p>
-                            <span class="book-price fs-6">₹220</span>
-                        </div>
-                    </a>
-                </div>
-            </div>
-             <div class="col-6 col-md-3 d-none d-md-block">
-                <div class="book-card border-0 shadow-sm">
-                    <a href="#" class="text-decoration-none text-dark">
-                        <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=600&auto=format&fit=crop" class="book-cover" alt="Book">
-                        <div class="p-3">
-                            <h3 class="book-title fs-6">The Art of Story</h3>
-                            <p class="book-author mb-1 small">Ved Prakash</p>
-                            <span class="book-price fs-6">₹299</span>
-                        </div>
-                    </a>
-                </div>
-            </div>
-             <div class="col-6 col-md-3 d-none d-md-block">
-                <div class="book-card border-0 shadow-sm">
-                    <a href="#" class="text-decoration-none text-dark">
-                        <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=600&auto=format&fit=crop" class="book-cover" alt="Book">
-                        <div class="p-3">
-                            <h3 class="book-title fs-6">Ghazals of the Night</h3>
-                            <p class="book-author mb-1 small">Aman Verma</p>
-                            <span class="book-price fs-6">₹199</span>
-                        </div>
-                    </a>
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 </section>
 
-<div class="offcanvas offcanvas-bottom rounded-top-4" tabindex="-1" id="mobileFilterBottom" aria-labelledby="mobileFilterLabel" style="height: 80vh;">
-    <div class="offcanvas-header border-bottom py-3">
-        <h5 class="offcanvas-title fw-bold font-playfair mb-0" id="mobileFilterLabel"><i class="fas fa-filter text-accent me-2"></i> Filter Books</h5>
-        <button type="button" class="btn-close text-reset shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    
-    <div class="offcanvas-body">
-        <div class="search-box mb-4">
-            <i class="fas fa-search"></i>
-            <input type="text" class="form-control py-2 bg-light border-0" placeholder="Search books...">
+<div class="offcanvas offcanvas-bottom rounded-top-4" tabindex="-1" id="mobileFilterBottom" aria-labelledby="mobileFilterLabel" style="height: 85vh; z-index: 99999 !important;">
+    <form action="{{ route('shop') }}" method="GET" id="mobileFilterForm" class="h-100 d-flex flex-column position-relative m-0">
+        <input type="hidden" name="sort" value="{{ request('sort', 'latest') }}" id="mobileSortHidden">
+        
+        <div class="offcanvas-header border-bottom py-3 flex-shrink-0">
+            <h5 class="offcanvas-title fw-bold font-playfair mb-0"><i class="fas fa-filter text-accent me-2"></i> Filter Books</h5>
+            <button type="button" class="btn-close text-reset shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
+        
+        <div class="offcanvas-body flex-grow-1" style="padding-bottom: 100px; overflow-y: auto;"> 
+            <div class="search-box mb-4">
+                <i class="fas fa-search"></i>
+                <input type="text" name="search" class="form-control py-2 bg-light border-0" placeholder="Search books..." value="{{ request('search') }}">
+            </div>
 
-        <h6 class="fw-bold mb-3 text-dark">Categories</h6>
-        <div class="mb-4">
-            <div class="form-check custom-checkbox mb-2">
-                <input class="form-check-input" type="checkbox" id="m_cat1" checked>
-                <label class="form-check-label w-100" for="m_cat1">Literature & Fiction</label>
+            <h6 class="fw-bold mb-3 text-dark">Categories</h6>
+            <div class="mb-4">
+                @foreach($categories as $category)
+                <div class="form-check custom-checkbox mb-2">
+                    <input class="form-check-input" type="checkbox" name="categories[]" value="{{ $category->id }}" id="m_cat{{ $category->id }}" @checked(is_array(request('categories')) && in_array($category->id, request('categories')))>
+                    <label class="form-check-label w-100" for="m_cat{{ $category->id }}">{{ $category->name }}</label>
+                </div>
+                @endforeach
             </div>
-            <div class="form-check custom-checkbox mb-2">
-                <input class="form-check-input" type="checkbox" id="m_cat2">
-                <label class="form-check-label w-100" for="m_cat2">Poetry & Ghazals</label>
-            </div>
-            <div class="form-check custom-checkbox mb-2">
-                <input class="form-check-input" type="checkbox" id="m_cat3">
-                <label class="form-check-label w-100" for="m_cat3">History & Culture</label>
-            </div>
-        </div>
 
-        <h6 class="fw-bold mb-3 text-dark">Price Range</h6>
-        <div class="row g-2 align-items-center mb-4">
-            <div class="col-5"><input type="number" class="price-input bg-light border-0" placeholder="Min" value="99"></div>
-            <div class="col-2 text-center text-muted fw-bold">-</div>
-            <div class="col-5"><input type="number" class="price-input bg-light border-0" placeholder="Max" value="999"></div>
-        </div>
+            <h6 class="fw-bold mb-3 text-dark">Price Range</h6>
+            <div class="row g-2 align-items-center mb-4">
+                <div class="col-5"><input type="number" name="min_price" class="price-input bg-light border-0" placeholder="Min" value="{{ request('min_price', 99) }}"></div>
+                <div class="col-2 text-center text-muted fw-bold">-</div>
+                <div class="col-5"><input type="number" name="max_price" class="price-input bg-light border-0" placeholder="Max" value="{{ request('max_price', 1999) }}"></div>
+            </div>
 
-        <h6 class="fw-bold mb-3 text-dark">Authors</h6>
-        <div class="mb-4">
-            <div class="form-check custom-checkbox mb-2">
-                <input class="form-check-input" type="checkbox" id="m_auth1">
-                <label class="form-check-label w-100" for="m_auth1">Ved Prakash Panday</label>
-            </div>
-            <div class="form-check custom-checkbox mb-2">
-                <input class="form-check-input" type="checkbox" id="m_auth2">
-                <label class="form-check-label w-100" for="m_auth2">Aditi Sharma</label>
+            <h6 class="fw-bold mb-3 text-dark">Authors</h6>
+            <div class="mb-0">
+                @foreach($authors as $author)
+                <div class="form-check custom-checkbox mb-2">
+                    <input class="form-check-input" type="checkbox" name="authors[]" value="{{ $author->id }}" id="m_auth{{ $author->id }}" @checked(is_array(request('authors')) && in_array($author->id, request('authors')))>
+                    <label class="form-check-label w-100" for="m_auth{{ $author->id }}">{{ $author->name }}</label>
+                </div>
+                @endforeach
             </div>
         </div>
-    </div>
-    
-    <div class="offcanvas-footer p-3 border-top bg-white">
-        <button class="btn btn-dark w-100 rounded-pill py-2 fw-bold" data-bs-dismiss="offcanvas">Apply Filters</button>
-    </div>
+        
+        <div class="position-absolute bottom-0 start-0 w-100 p-3 bg-white border-top shadow-lg" style="z-index: 10;">
+            <button type="submit" class="btn btn-dark w-100 rounded-pill py-3 fw-bold fs-6 shadow-sm">
+                Apply Filters <i class="fas fa-check ms-1"></i>
+            </button>
+        </div>
+    </form>
 </div>
+@endsection
 
+@section('scripts')
+<script>
+    $(document).ready(function() {
+        // 🔥 AJAX Add To Cart Logic
+        $('.add-to-cart-btn').on('click', function(e) {
+            e.preventDefault();   // Button click ki default working roko
+            e.stopPropagation();  // Important: Card ke <a> link par redirect hone se roko
+
+            let bookId = $(this).data('id');
+            let btn = $(this);
+            
+            // Button Animation Feedback
+            btn.html('<i class="fas fa-spinner fa-spin"></i>');
+
+            $.ajax({
+                url: "{{ route('cart.add') }}",
+                method: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    book_id: bookId,
+                    quantity: 1
+                },
+                success: function(response) {
+                    if(response.status === 'success') {
+                        // Restore Button Icon
+                        btn.html('<i class="fas fa-check"></i>');
+                        setTimeout(() => btn.html('<i class="fas fa-cart-plus"></i>'), 2000);
+
+                        // Update Navigation Cart Badges (Desktop + Mobile)
+                        if (typeof window.updateCartUI === 'function') {
+                            window.updateCartUI(response.cart_count);
+                        }
+
+                        // Success Toast
+                        Swal.fire({
+                            toast: true,
+                            position: 'bottom-end',
+                            icon: 'success',
+                            title: 'Book added to your bag!',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            background: '#1e293b',
+                            color: '#fff',
+                            iconColor: '#d97706'
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    btn.html('<i class="fas fa-cart-plus"></i>');
+                    Swal.fire({
+                        toast: true,
+                        position: 'bottom-end',
+                        icon: 'error',
+                        title: 'Oops! Something went wrong.',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                }
+            });
+        });
+    });
+</script>
 @endsection

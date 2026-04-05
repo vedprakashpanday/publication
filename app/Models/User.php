@@ -12,14 +12,16 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    // 'role' ko fillable mein add karna zaroori hai
     protected $fillable = [
         'name',
         'email',
+        'phone', // <-- Ye add karein
+        'otp',   // <-- Ye add karein
+        'otp_expires_at', // <-- Ye add karein
         'password',
         'role', 
-        'seller_type', // Naya add kiya
-        'shop_name',   // Naya add kiya
+        'seller_type', 
+        'shop_name',   
         'profile_image', 
     ];
 
@@ -56,5 +58,18 @@ class User extends Authenticatable
     public function sales()
     {
         return $this->hasMany(Sale::class, 'user_id');
+    }
+
+    // Naye Relations
+    public function addresses() {
+        return $this->hasMany(Address::class);
+    }
+
+    public function wishlists() {
+        return $this->hasMany(Wishlist::class);
+    }
+    
+    public function orders() {
+        return $this->hasMany(Order::class);
     }
 }

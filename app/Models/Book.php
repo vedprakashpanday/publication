@@ -5,20 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 class Book extends Model {
+   // $fillable array mein ye naye columns add karein
     protected $fillable = [
-        'publisher_id',
-        'author_id',       // <-- Ye missing tha
-        'title',
-        'isbn_13',
-        'edition',         // <-- Naya column
-        'published_date',  // <-- Naya column
-        'binding',         // <-- Naya column
-        'price',
-        'quantity',
-        'description',
-        
-        'is_active',
+        'publisher_id', 'author_id', 'category_id', 'title', 'isbn_13', 'edition', 
+        'published_date', 'binding', 'mrp', 'price', 'quantity', 'description', 
+        'is_exclusive', 'is_active'
     ];
+
+    // Naya Relation
+    public function category() {
+        return $this->belongsTo(Category::class);
+    }
 
     public function publisher() { return $this->belongsTo(Publisher::class); }
 

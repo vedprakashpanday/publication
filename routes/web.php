@@ -15,31 +15,36 @@ use App\Http\Controllers\Admin\SalesController;
 use App\Http\Controllers\Admin\BuyerStoryController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\Frontend\ShopController;
+use App\Http\Controllers\Frontend\AuthController;
+use App\Http\Controllers\Frontend\CartController;
+use App\Http\Controllers\Frontend\CheckoutController;
 
 /*
 |--------------------------------------------------------------------------
 | Public Routes
 |--------------------------------------------------------------------------
 */
-Route::get('/', function () {
-    return view('frontend.home');
-});
+// Route::get('/', function () {
+//     return view('frontend.home');
+// });
 
 Route::get('/book', function () {
     return view('frontend.book-details'); // File ka naam jo aapne save kiya hai
 });
 
-Route::get('/shop', function () {
-    return view('frontend.shop'); 
-});
+// Route::get('/shop', function () {
+//     return view('frontend.shop'); 
+// });
 
 Route::get('/cart', function () {
     return view('frontend.cart'); 
 });
 
-Route::get('/checkout', function () {
-    return view('frontend.checkout'); 
-});
+// Route::get('/checkout', function () {
+//     return view('frontend.checkout'); 
+// });
 
 Route::get('/udashboard', function () {
     return view('frontend.user-dashboard'); 
@@ -109,3 +114,36 @@ Route::middleware(['auth', 'admin'])
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('/settings/update', [SettingController::class, 'update'])->name('settings.update');
     });
+
+
+
+
+    // Front end
+
+    // Frontend Pages
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/shop', [ShopController::class, 'index'])->name('shop');
+Route::get('/book/{slug}', [ShopController::class, 'show'])->name('book.show');
+
+// Baaki pages ke dummy routes (Inhe hum baad mein banayenge)
+Route::get('/cart', function () { return view('frontend.cart'); })->name('cart');
+
+Route::get('/my-account', function () { return view('frontend.user-dashboard'); })->name('dashboard');
+
+// Auth (Ajax Modals ke liye routes)
+Route::post('/ajax-login', [AuthController::class, 'login'])->name('ajax.login');
+Route::post('/ajax-register', [AuthController::class, 'register'])->name('ajax.register');
+
+// Cart Routes
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::patch('/cart/update', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+Route::post('/cart/save-for-later/{id}', [CartController::class, 'saveForLater'])->name('cart.saveForLater');
+Route::post('/cart/move-to-cart/{id}', [CartController::class, 'moveToCart'])->name('cart.moveToCart');
+
+
+// Purane routes hata kar ye clean logic daalein
+Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+Route::post('/place-order', [CheckoutController::class, 'placeOrder'])->name('placeOrder');
+Route::get('/order-success/{order_number}', [CheckoutController::class, 'success'])->name('checkout.success');
