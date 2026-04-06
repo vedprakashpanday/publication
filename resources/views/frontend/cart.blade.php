@@ -235,7 +235,9 @@
 
 @endsection
 
-@section('scripts')
+
+    
+@push('scripts')
 <script>
     // Logic: Update Qty + Auto Remove if < 1
     // $('.update-cart').click(function (e) {
@@ -328,4 +330,4 @@
     });
 });
 </script>
-@endsection
+@endpush

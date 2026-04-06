@@ -147,3 +147,9 @@ Route::post('/cart/move-to-cart/{id}', [CartController::class, 'moveToCart'])->n
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
 Route::post('/place-order', [CheckoutController::class, 'placeOrder'])->name('placeOrder');
 Route::get('/order-success/{order_number}', [CheckoutController::class, 'success'])->name('checkout.success');
+
+// All Authors List
+Route::get('/authors', [App\Http\Controllers\Frontend\AuthorController::class, 'index'])->name('authors.index');
+
+// Single Author Details
+Route::get('/author/{id}', [App\Http\Controllers\Frontend\AuthorController::class, 'show'])->name('authors.show');

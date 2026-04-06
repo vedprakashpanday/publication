@@ -20,6 +20,12 @@
         bottom: 20%;
     }
 
+    .book-card:hover .book-cover {
+    border-color: var(--accent-color) !important;
+    transform: scale(1.03);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+}
+
     /* =========================================
        BOOK CARDS (Premium UI)
        ========================================= */
@@ -152,24 +158,34 @@
         <div class="d-flex justify-content-between align-items-end mb-4">
             <div>
                 <span class="text-uppercase fw-bold small text-muted letter-spacing">Fresh off the press</span>
-                <h2 class="mb-0">New Arrivals</h2>
+                <h2 class="mb-0 font-playfair fw-bold">New Arrivals</h2>
             </div>
-            <a href="{{ route('shop') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3 d-none d-md-block">View All</a>
+            <a href="{{ route('shop', ['filter' => 'new-arrivals']) }}" class="btn btn-outline-dark btn-sm rounded-pill px-3 d-none d-md-block">View All</a>
         </div>
 
         <div class="row g-3 g-md-4">
             @foreach($newArrivals as $book)
             <div class="col-6 col-md-4 col-lg-3 {{ $loop->iteration == 4 ? 'd-none d-md-block' : '' }}">
-                <div class="book-card">
-                    @php $frontImage = $book->images->where('image_type', 'front')->first(); @endphp
-                    <img src="{{ $frontImage ? asset('storage/'.$frontImage->image_path) : 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=600&auto=format&fit=crop' }}" class="book-cover" alt="{{ $book->title }}">
+                <div class="book-card h-100 shadow-sm border rounded-3 overflow-hidden">
+                    <a href="{{ route('book.show', $book->slug ?? $book->id) }}">
+                        @php $frontImage = $book->images->where('image_type', 'front')->first(); @endphp
+                        <img src="{{ $frontImage ? asset('storage/'.$frontImage->image_path) : 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=600&auto=format&fit=crop' }}" class="book-cover w-100" alt="{{ $book->title }}" style="aspect-ratio: 2/3; object-fit: cover;">
+                    </a>
                     
                     <div class="p-3 d-flex flex-column flex-grow-1">
-                        <h3 class="book-title">{{ $book->title }}</h3>
-                        <p class="book-author">{{ $book->author->name ?? 'Unknown Author' }}</p>
+                        <a href="{{ route('book.show', $book->slug ?? $book->id) }}" class="text-decoration-none">
+                            <h3 class="book-title text-dark fs-6 fw-bold mb-1">{{ $book->title }}</h3>
+                        </a>
+                        <p class="book-author small text-muted mb-3">{{ $book->author->name ?? 'Unknown Author' }}</p>
+                        
                         <div class="mt-auto d-flex justify-content-between align-items-center">
-                            <span class="book-price">₹{{ $book->price }}</span>
-                            <button class="btn btn-accent btn-sm rounded-circle shadow-sm" title="Add to Cart"><i class="fas fa-cart-plus"></i></button>
+                            <span class="book-price fw-bold text-accent">₹{{ $book->price }}</span>
+                            <button type="button" class="btn btn-accent btn-sm rounded-circle shadow-sm add-to-cart-home" 
+                                    data-id="{{ $book->id }}" 
+                                    title="Add to Cart" 
+                                    style="width: 35px; height: 35px;">
+                                <i class="fas fa-cart-plus"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -178,29 +194,54 @@
         </div>
         
         <div class="text-center mt-4 d-md-none">
-            <a href="{{ route('shop') }}" class="btn btn-outline-dark rounded-pill px-4 w-100">View All Arrivals</a>
+            <a href="{{ route('shop', ['filter' => 'new-arrivals']) }}" class="btn btn-outline-dark rounded-pill px-4 w-100 fw-bold">View All Arrivals</a>
         </div>
     </div>
 </section>
+
 
 <section class="py-5" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
     <div class="container">
         <div class="row align-items-center g-4">
             <div class="col-lg-5 text-center text-lg-start">
-                <span class="badge bg-warning text-dark mb-2 px-3 py-2 rounded-pill fw-bold">Divyansh Originals</span>
-                <h2 class="display-5 fw-bold text-white mb-3 mt-2">Only on Divyansh</h2>
+                <span class="badge bg-warning text-dark mb-2 px-3 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px;">Divyansh Originals</span>
+                <h2 class="display-5 fw-bold text-white mb-3 mt-2 font-playfair">Only on Divyansh</h2>
                 <p class="text-light opacity-75 mb-4 px-3 px-lg-0">Discover literary gems published exclusively by us. Unedited, unfiltered, and deeply original content that you won't find anywhere else.</p>
-                <a href="{{ route('shop') }}" class="btn btn-accent rounded-pill px-4 py-2">View Exclusive Collection</a>
+                
+                <a href="{{ route('shop', ['filter' => 'exclusive']) }}" class="btn btn-outline-danger rounded-pill px-4 py-2 fw-bold">
+                    View Exclusive Collection <i class="fas fa-arrow-right ms-2 small"></i>
+                </a>
             </div>
+
             <div class="col-lg-7">
                 <div class="row g-3 justify-content-center">
                     @foreach($exclusiveBooks as $book)
                     <div class="col-5 col-md-4 {{ $loop->iteration == 3 ? 'd-none d-md-block' : '' }}">
-                        <div class="book-card border-0 bg-transparent text-white text-center" style="box-shadow: none;">
-                            @php $frontImage = $book->images->where('image_type', 'front')->first(); @endphp
-                            <img src="{{ $frontImage ? asset('storage/'.$frontImage->image_path) : 'https://images.unsplash.com/photo-1476275466078-4007374efbbe?q=80&w=400&auto=format&fit=crop' }}" class="book-cover rounded-3 shadow-lg mb-2" alt="{{ $book->title }}" style="border: 2px solid #334155;">
-                            <h3 class="book-title text-white fs-6 mb-0">{{ $book->title }}</h3>
-                            <span class="text-warning fw-bold small">₹{{ $book->price }}</span>
+                        <div class="book-card border-0 bg-transparent text-white text-center position-relative" style="box-shadow: none;">
+                            
+                            <a href="{{ route('book.show', $book->slug ?? $book->id) }}" class="d-block mb-2">
+                                @php $frontImage = $book->images->where('image_type', 'front')->first(); @endphp
+                                <img src="{{ $frontImage ? asset('storage/'.$frontImage->image_path) : 'https://images.unsplash.com/photo-1476275466078-4007374efbbe?q=80&w=400&auto=format&fit=crop' }}" 
+                                     class="book-cover rounded-3 shadow-lg w-100" 
+                                     alt="{{ $book->title }}" 
+                                     style="border: 2px solid #334155; aspect-ratio: 2/3; object-fit: cover; transition: 0.3s;">
+                            </a>
+
+                            <a href="{{ route('book.show', $book->slug ?? $book->id) }}" class="text-decoration-none">
+                                <h3 class="book-title text-white fs-6 mb-1 text-truncate">{{ $book->title }}</h3>
+                            </a>
+
+                            <div class="d-flex align-items-center justify-content-center gap-2">
+                                <span class="text-warning fw-bold small">₹{{ $book->price }}</span>
+                                
+                                <button type="button" 
+                                        class="btn btn-sm p-0 text-white border-0 add-to-cart-home" 
+                                        data-id="{{ $book->id }}" 
+                                        style="background: transparent;"
+                                        title="Quick Add">
+                                    <i class="fas fa-plus-circle text-accent fs-5"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     @endforeach
@@ -212,79 +253,135 @@
 
 <section class="py-5 bg-white">
     <div class="container">
-        <div class="text-center mb-5">
-            <span class="text-uppercase fw-bold small text-muted letter-spacing">Master Wordsmiths</span>
-            <h2 class="mb-0">Meet Our Top Authors</h2>
+        <div class="d-flex justify-content-between align-items-end mb-5">
+            <div class="text-center text-md-start">
+                <span class="text-uppercase fw-bold small text-muted letter-spacing">Master Wordsmiths</span>
+                <h2 class="mb-0 font-playfair fw-bold">Meet Our Top Authors</h2>
+            </div>
+            <a href="{{ route('authors.index') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3 d-none d-md-block">View All Authors</a>
         </div>
 
         <div class="row g-4 justify-content-center">
             @foreach($topAuthors as $author)
-            <div class="col-6 col-md-3 col-lg-2">
-                <div class="author-circle-wrapper">
-                    <img src="{{ $author->profile_image ? asset('storage/'.$author->profile_image) : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop' }}" class="rounded-circle author-img mb-3" alt="{{ $author->name }}">
+            <div class="col-6 col-md-3 col-lg-2 text-center">
+                <a href="{{ route('authors.show', $author->id) }}" class="text-decoration-none author-circle-wrapper d-block">
+                    <img src="{{ $author->profile_image ? asset('storage/'.$author->profile_image) : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop' }}" 
+                         class="rounded-circle author-img mb-3 shadow-sm border border-2" alt="{{ $author->name }}"
+                         style="width: 120px; height: 120px; object-fit: cover;">
                     <h5 class="fw-bold fs-6 text-dark mb-0">{{ $author->name }}</h5>
-                    <small class="text-muted">Author</small>
-                </div>
+                    <small class="text-muted">{{ $author->books_count ?? '0' }} Books</small>
+                </a>
             </div>
             @endforeach
+        </div>
+        
+        <div class="text-center mt-4 d-md-none">
+            <a href="{{ route('authors.index') }}" class="btn btn-outline-dark rounded-pill px-4 w-100 fw-bold">Explore All Authors</a>
         </div>
     </div>
 </section>
 
+
 <section class="py-5" style="background-color: var(--bg-light);">
     <div class="container">
-        <div class="text-center mb-4">
-            <span class="text-uppercase fw-bold small text-muted letter-spacing">Curated Collection</span>
-            <h2 class="mb-0">Books by Top Authors</h2>
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div class="text-center text-md-start w-100">
+                <span class="text-uppercase fw-bold small text-muted letter-spacing">Curated Collection</span>
+                <h2 class="mb-0 font-playfair fw-bold">Books by Top Authors</h2>
+            </div>
+            <a href="{{ route('shop', ['filter' => 'top-authors']) }}" class="btn btn-outline-dark btn-sm rounded-pill px-3 d-none d-md-block">View All</a>
         </div>
 
         <div class="row g-3 g-md-4">
             @foreach($booksByTopAuthors as $book)
             <div class="col-6 col-md-4 col-lg-3 {{ $loop->iteration == 4 ? 'd-none d-md-block' : '' }}">
-                <div class="book-card border-0 shadow-sm">
-                    <span class="badge bg-dark position-absolute m-2">By {{ explode(' ', trim($book->author->name ?? 'Unknown'))[0] }}</span>
-                    @php $frontImage = $book->images->where('image_type', 'front')->first(); @endphp
-                    <img src="{{ $frontImage ? asset('storage/'.$frontImage->image_path) : 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=600&auto=format&fit=crop' }}" class="book-cover" alt="{{ $book->title }}">
-                    <div class="p-3">
-                        <h3 class="book-title">{{ $book->title }}</h3>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="book-price">₹{{ $book->price }}</span>
-                            <button class="btn btn-outline-primary btn-sm rounded-circle"><i class="fas fa-cart-plus"></i></button>
+                <div class="book-card border-0 shadow-sm h-100">
+                    <span class="badge bg-dark position-absolute m-2" style="z-index: 2;">By {{ explode(' ', trim($book->author->name ?? 'Unknown'))[0] }}</span>
+                    
+                    <a href="{{ route('book.show', $book->slug ?? $book->id) }}" class="d-block">
+                        @php $frontImage = $book->images->where('image_type', 'front')->first(); @endphp
+                        <img src="{{ $frontImage ? asset('storage/'.$frontImage->image_path) : 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=600&auto=format&fit=crop' }}" 
+                             class="book-cover w-100" 
+                             alt="{{ $book->title }}"
+                             style="aspect-ratio: 2/3; object-fit: cover;">
+                    </a>
+
+                    <div class="p-3 d-flex flex-column flex-grow-1">
+                        <a href="{{ route('book.show', $book->slug ?? $book->id) }}" class="text-decoration-none">
+                            <h3 class="book-title text-dark fs-6 fw-bold mb-1">{{ $book->title }}</h3>
+                        </a>
+                        
+                        <div class="mt-auto d-flex justify-content-between align-items-center mt-3">
+                            <span class="book-price fw-bold text-accent">₹{{ $book->price }}</span>
+                            
+                            <button type="button" 
+                                    class="btn btn-accent btn-sm rounded-circle shadow-sm add-to-cart-home" 
+                                    data-id="{{ $book->id }}" 
+                                    title="Add to Cart"
+                                    style="width: 35px; height: 35px;">
+                                <i class="fas fa-cart-plus"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
             @endforeach
         </div>
+
+        <div class="text-center mt-4 d-md-none">
+            <a href="{{ route('shop', ['filter' => 'top-authors']) }}" class="btn btn-outline-dark rounded-pill px-4 w-100 fw-bold">View All by Top Authors</a>
+        </div>
     </div>
 </section>
-
 <section class="py-5 bg-white border-top">
     <div class="container">
         <div class="d-flex justify-content-between align-items-end mb-4">
             <div>
                 <span class="text-uppercase fw-bold small text-muted letter-spacing">5-Star Favorites</span>
-                <h2 class="mb-0">Top Rated Books</h2>
+                <h2 class="mb-0 font-playfair fw-bold">Top Rated Books</h2>
             </div>
+            <a href="{{ route('shop', ['filter' => 'top-rated']) }}" class="btn btn-outline-dark btn-sm rounded-pill px-3 d-none d-md-block">View All</a>
         </div>
 
         <div class="row g-3 g-md-4">
             @foreach($topRatedBooks as $book)
             <div class="col-6 col-md-3 {{ $loop->iteration > 2 ? 'd-none d-md-block' : '' }}">
-                <div class="book-card border-0 shadow-sm bg-light text-center p-2">
-                    @php $frontImage = $book->images->where('image_type', 'front')->first(); @endphp
-                    <img src="{{ $frontImage ? asset('storage/'.$frontImage->image_path) : 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=600&auto=format&fit=crop' }}" class="book-cover rounded-3 mb-2" alt="{{ $book->title }}">
+                <div class="book-card border-0 shadow-sm bg-light text-center p-3 h-100 d-flex flex-column">
                     
-                    <div class="text-warning small mb-1">
+                    <a href="{{ route('book.show', $book->slug ?? $book->id) }}" class="d-block mb-2">
+                        @php $frontImage = $book->images->where('image_type', 'front')->first(); @endphp
+                        <img src="{{ $frontImage ? asset('storage/'.$frontImage->image_path) : 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=600&auto=format&fit=crop' }}" 
+                             class="book-cover rounded-3 mb-2 w-100" 
+                             alt="{{ $book->title }}"
+                             style="aspect-ratio: 2/3; object-fit: cover;">
+                    </a>
+                    
+                    <div class="text-warning small mb-2">
                         <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                         @if($loop->iteration % 2 == 0) <i class="fas fa-star"></i> @else <i class="fas fa-star-half-alt"></i> @endif
                     </div>
                     
-                    <h3 class="book-title fs-6">{{ $book->title }}</h3>
-                    <span class="book-price d-block mt-2">₹{{ $book->price }}</span>
+                    <a href="{{ route('book.show', $book->slug ?? $book->id) }}" class="text-decoration-none">
+                        <h3 class="book-title fs-6 text-dark fw-bold mb-2">{{ $book->title }}</h3>
+                    </a>
+
+                    <div class="mt-auto">
+                        <span class="book-price d-block mb-2 fw-bold text-accent">₹{{ $book->price }}</span>
+                        
+                        <button type="button" 
+                                class="btn btn-dark btn-sm rounded-pill px-3 fw-bold add-to-cart-home w-100" 
+                                data-id="{{ $book->id }}"
+                                style="font-size: 0.75rem;">
+                            <i class="fas fa-cart-plus me-1"></i> Add to Bag
+                        </button>
+                    </div>
                 </div>
             </div>
             @endforeach
+        </div>
+
+        <div class="text-center mt-4 d-md-none">
+            <a href="{{ route('shop', ['filter' => 'top-rated']) }}" class="btn btn-outline-dark rounded-pill px-4 w-100 fw-bold">View All 5-Star Favorites</a>
         </div>
     </div>
 </section>
@@ -294,30 +391,103 @@
         <div class="d-flex justify-content-between align-items-end mb-4">
             <div>
                 <span class="text-uppercase fw-bold small text-muted letter-spacing">Trending Now</span>
-                <h2 class="mb-0">Most Read Publications</h2>
+                <h2 class="mb-0 font-playfair fw-bold">Most Read Publications</h2>
             </div>
+            <a href="{{ route('shop', ['filter' => 'trending']) }}" class="btn btn-outline-dark btn-sm rounded-pill px-3 d-none d-md-block">View All</a>
         </div>
 
         <div class="row g-3 g-md-4">
             @foreach($trendingBooks as $book)
             <div class="col-6 col-md-4 col-lg-3 {{ $loop->iteration > 2 ? 'd-none d-md-block' : '' }}">
-                <div class="book-card border-0 shadow-sm">
-                    <div class="position-absolute bg-danger text-white small px-2 py-1 m-2 rounded shadow-sm"><i class="fas fa-fire me-1"></i> Trending</div>
-                    @php $frontImage = $book->images->where('image_type', 'front')->first(); @endphp
-                    <img src="{{ $frontImage ? asset('storage/'.$frontImage->image_path) : 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=600&auto=format&fit=crop' }}" class="book-cover" alt="{{ $book->title }}">
-                    <div class="p-3">
-                        <h3 class="book-title">{{ $book->title }}</h3>
-                        <p class="book-author">{{ $loop->iteration == 1 ? 'Thousands reading now' : 'Highly Demanded' }}</p>
-                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                            <span class="book-price">₹{{ $book->price }}</span>
-                            <button class="btn btn-accent btn-sm rounded-circle"><i class="fas fa-cart-plus"></i></button>
+                <div class="book-card border-0 shadow-sm h-100 d-flex flex-column">
+                    <div class="position-absolute bg-danger text-white small px-2 py-1 m-2 rounded shadow-sm" style="z-index: 2;">
+                        <i class="fas fa-fire me-1"></i> Trending
+                    </div>
+                    
+                    <a href="{{ route('book.show', $book->slug ?? $book->id) }}" class="d-block">
+                        @php $frontImage = $book->images->where('image_type', 'front')->first(); @endphp
+                        <img src="{{ $frontImage ? asset('storage/'.$frontImage->image_path) : 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=600&auto=format&fit=crop' }}" 
+                             class="book-cover w-100" 
+                             alt="{{ $book->title }}"
+                             style="aspect-ratio: 2/3; object-fit: cover;">
+                    </a>
+
+                    <div class="p-3 d-flex flex-column flex-grow-1">
+                        <a href="{{ route('book.show', $book->slug ?? $book->id) }}" class="text-decoration-none">
+                            <h3 class="book-title text-dark fs-6 fw-bold mb-1">{{ $book->title }}</h3>
+                        </a>
+                        <p class="book-author small text-muted mb-3">{{ $loop->iteration == 1 ? 'Thousands reading now' : 'Highly Demanded' }}</p>
+                        
+                        <div class="mt-auto d-flex justify-content-between align-items-center">
+                            <span class="book-price fw-bold text-accent">₹{{ $book->price }}</span>
+                            
+                            <button type="button" 
+                                    class="btn btn-accent btn-sm rounded-circle shadow-sm add-to-cart-home" 
+                                    data-id="{{ $book->id }}" 
+                                    title="Add to Cart"
+                                    style="width: 35px; height: 35px;">
+                                <i class="fas fa-cart-plus"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
             @endforeach
         </div>
+
+        <div class="text-center mt-4 d-md-none">
+            <a href="{{ route('shop', ['filter' => 'trending']) }}" class="btn btn-outline-dark rounded-pill px-4 w-100 fw-bold">Explore All Trending</a>
+        </div>
     </div>
 </section>
 
 @endsection
+
+@push('scripts')
+   
+
+<script>
+$(document).ready(function() {
+   $(document).on('click', '.add-to-cart-home', function(e) {
+   
+    
+        e.preventDefault();
+        let bookId = $(this).data('id');
+        let btn = $(this);
+        
+        btn.html('<i class="fas fa-spinner fa-spin"></i>'); // Loading state
+
+        $.ajax({
+            url: "{{ route('cart.add') }}",
+            method: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                book_id: bookId,
+                quantity: 1
+            },
+            success: function(response) {
+                btn.html('<i class="fas fa-check"></i>');
+                setTimeout(() => btn.html('<i class="fas fa-cart-plus"></i>'), 2000);
+
+                // Global Count Update
+               if (typeof window.updateCartUI === 'function') {
+            window.updateCartUI(response); 
+        }
+
+                Swal.fire({
+                    toast: true,
+                    position: 'bottom-end',
+                    icon: 'success',
+                    title: 'Added to your bag!',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    background: '#1e293b',
+                    color: '#fff'
+                });
+            }
+        });
+    });
+});
+</script>
+
+@endpush

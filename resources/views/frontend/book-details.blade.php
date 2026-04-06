@@ -341,7 +341,7 @@
 
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
     function updateQty(change) {
         let input = document.getElementById('qtyInput');
@@ -361,7 +361,7 @@
         element.classList.add('active');
     }
 </script>
-@endsection
+@endpush
 
 @push('scripts')
     <script>

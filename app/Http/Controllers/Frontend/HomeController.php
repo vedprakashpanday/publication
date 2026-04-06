@@ -19,7 +19,9 @@ class HomeController extends Controller
         $exclusiveBooks = Book::with('images')->where('is_exclusive', true)->where('is_active', true)->take(3)->get();
 
         // 3. Top Authors (4 authors)
-        $topAuthors = Author::take(4)->get();
+        $topAuthors = Author::withCount('books')
+        ->take(4)
+        ->get();
 
         // 4. Books by Top Authors (4 books)
         $booksByTopAuthors = Book::with(['author', 'images'])->where('is_active', true)->inRandomOrder()->take(4)->get();

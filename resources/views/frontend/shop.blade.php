@@ -317,19 +317,21 @@
 </div>
 @endsection
 
-@section('scripts')
+
+@push('scripts')
 <script>
     $(document).ready(function() {
-        // 🔥 AJAX Add To Cart Logic
-        $('.add-to-cart-btn').on('click', function(e) {
-            e.preventDefault();   // Button click ki default working roko
-            e.stopPropagation();  // Important: Card ke <a> link par redirect hone se roko
+        // 🔥 AJAX Add To Cart Logic for Shop Page
+        $(document).on('click', '.add-to-cart-btn', function(e) {
+            e.preventDefault();   // Form/Link behavior roko
+            e.stopPropagation();  // ❗ Sabse zaroori: Card ke link par redirect hone se roko
 
             let bookId = $(this).data('id');
             let btn = $(this);
             
-            // Button Animation Feedback
-            btn.html('<i class="fas fa-spinner fa-spin"></i>');
+            // Visual Feedback: Loading Spinner
+            let originalHtml = btn.html();
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
 
             $.ajax({
                 url: "{{ route('cart.add') }}",
@@ -341,43 +343,44 @@
                 },
                 success: function(response) {
                     if(response.status === 'success') {
-                        // Restore Button Icon
+                        // 1. Restore Button Icon with a Checkmark
                         btn.html('<i class="fas fa-check"></i>');
-                        setTimeout(() => btn.html('<i class="fas fa-cart-plus"></i>'), 2000);
-
-                        // Update Navigation Cart Badges (Desktop + Mobile)
+                        
+                        // 2. 🌟 Update Navigation Cart (Badge + Mini Cart Dropdown)
                         if (typeof window.updateCartUI === 'function') {
-                            window.updateCartUI(response.cart_count);
+                            window.updateCartUI(response); 
                         }
 
-                        // Success Toast
+                        // 3. Success Toast
                         Swal.fire({
                             toast: true,
                             position: 'bottom-end',
                             icon: 'success',
                             title: 'Book added to your bag!',
                             showConfirmButton: false,
-                            timer: 3000,
+                            timer: 2500,
                             timerProgressBar: true,
                             background: '#1e293b',
                             color: '#fff',
                             iconColor: '#d97706'
                         });
+
+                        // 4. Reset Button after 2 seconds
+                        setTimeout(() => {
+                            btn.prop('disabled', false).html(originalHtml);
+                        }, 2000);
                     }
                 },
                 error: function(xhr) {
-                    btn.html('<i class="fas fa-cart-plus"></i>');
+                    btn.prop('disabled', false).html(originalHtml);
                     Swal.fire({
-                        toast: true,
-                        position: 'bottom-end',
                         icon: 'error',
-                        title: 'Oops! Something went wrong.',
-                        showConfirmButton: false,
-                        timer: 3000
+                        title: 'Oops!',
+                        text: 'Something went wrong while adding to cart.',
                     });
                 }
             });
         });
     });
 </script>
-@endsection
+@endpush

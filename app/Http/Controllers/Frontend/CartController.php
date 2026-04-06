@@ -22,31 +22,28 @@ class CartController extends Controller
     $book = Book::with('images')->findOrFail($request->book_id);
     $cart = session()->get('cart', []);
 
-    // Agar book pehle se cart mein hai toh quantity badhao
-    if(isset($cart[$book->id])) {
+   if(isset($cart[$book->id])) {
         $cart[$book->id]['quantity'] += $request->quantity ?? 1;
     } else {
-        // 1. Pehle 'front' image dhoondo
-        $frontImage = $book->images->where('image_type', 'front')->first();
-        
-        // 2. Agar 'front' nahi mili, toh koi bhi pehli image utha lo (SMART FALLBACK)
-        if(!$frontImage) {
-            $frontImage = $book->images->first();
-        }
-
-        // Nayi book add karo
+        $frontImage = $book->images->where('image_type', 'front')->first() ?? $book->images->first();
         $cart[$book->id] = [
             "title" => $book->title,
             "quantity" => $request->quantity ?? 1,
             "price" => $book->price,
-            "image" => $frontImage ? $frontImage->image_path : null, // Null jayega agar koi image nahi hai
+            "image" => $frontImage ? $frontImage->image_path : null,
             "author" => $book->author->name ?? 'Unknown'
         ];
     }
-
     session()->put('cart', $cart);
-    
-   return back()->with(['status' => 'success', 'message' => 'Book added to cart!', 'cart_count' => count($cart)]);
+
+   // 🌟 YAHAN HAI JADOO: Naya HTML render karke bhej rahe hain
+    $miniCartHtml = view('frontend.partials.mini-cart-items')->render();
+
+    return response()->json([
+        'status' => 'success',
+        'cart_count' => count($cart),
+        'mini_cart' => $miniCartHtml // Ye naya HTML JS ko jayega
+    ]);
 }
 
     // Cart update karne ke liye

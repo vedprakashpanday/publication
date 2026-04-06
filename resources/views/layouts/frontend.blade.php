@@ -179,10 +179,18 @@
             
             <div class="collapse navbar-collapse desktop-nav-elements">
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="{{ url('/') }}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link {{ request()->is('shop*') ? 'active' : '' }}" href="{{ route('shop') }}">Shop Books</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Authors</a></li>
-                </ul>
+    <li class="nav-item">
+        <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="{{ url('/') }}">Home</a>
+    </li>
+    
+    <li class="nav-item">
+        <a class="nav-link {{ request()->is('shop*') ? 'active' : '' }}" href="{{ route('shop') }}">Shop Books</a>
+    </li>
+    
+    <li class="nav-item">
+        <a class="nav-link {{ request()->is('authors*') ? 'active' : '' }}" href="{{ route('authors.index') }}">Authors</a>
+    </li>
+</ul>
 
                 <div class="d-flex align-items-center gap-3">
                     <a href="#" class="text-dark fs-5" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fas fa-search"></i></a>
@@ -194,45 +202,8 @@
                         </a>
                         
                        <div class="mini-cart-dropdown">
-                            <div class="mini-cart-content">
-                                <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
-                                    <h6 class="mb-0 fw-bold font-playfair text-dark">Your Bag</h6>
-                                    <span class="badge bg-secondary rounded-pill"><span class="count-sync">{{ $cartCount }}</span> items</span>
-                                </div>
-                                
-                                <div class="mini-cart-items p-2">
-                                    @forelse($cart as $id => $details)
-                                        @php $miniSubtotal += $details['price'] * $details['quantity']; @endphp
-                                        <div class="d-flex align-items-center p-2 border-bottom mini-cart-item">
-                                            <img src="{{ $details['image'] ? asset('uploads/books/covers/'.$details['image']) : 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=50&auto=format&fit=crop' }}" alt="" style="width: 45px; height: 65px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0;">
-                                            <div class="ms-3 flex-grow-1">
-                                                <h6 class="mb-1 small fw-bold text-dark text-truncate" style="max-width: 140px;">{{ $details['title'] }}</h6>
-                                                <div class="text-muted" style="font-size: 0.75rem;">Qty: {{ $details['quantity'] }}</div>
-                                            </div>
-                                            <div class="fw-bold small text-accent">₹{{ $details['price'] * $details['quantity'] }}</div>
-                                        </div>
-                                    @empty
-                                        <div class="text-center py-4 text-muted small">
-                                            <i class="fas fa-shopping-bag fs-3 mb-2 opacity-50"></i><br>
-                                            Looks like your bag is empty.
-                                        </div>
-                                    @endforelse
-                                </div>
-                                
-                                @if($cartCount > 0)
-                                <div class="p-3 bg-light border-top">
-                                    <div class="d-flex justify-content-between fw-bold text-dark mb-3">
-                                        <span>Subtotal:</span>
-                                        <span>₹{{ $miniSubtotal }}</span>
-                                    </div>
-                                    <div class="d-grid gap-2">
-                                        <a href="{{ route('checkout') }}" class="btn btn-accent btn-sm rounded-pill fw-bold text-dark border shadow-sm">Secure Checkout</a>
-                                        <a href="{{ route('cart.index') }}" class="btn btn-outline-dark btn-sm rounded-pill fw-bold">View Bag</a>
-                                    </div>
-                                </div>
-                                @endif
-                            </div>
-                        </div>
+    @include('frontend.partials.mini-cart-items')
+</div>
                     </div>
 
                     @guest
@@ -268,18 +239,73 @@
     <main>@yield('content')</main>
 
     <footer class="footer-custom">
-        <div class="container">
-            <div class="row g-4 text-center text-md-start">
-                <div class="col-lg-4">
-                    <h4 class="text-white mb-3">Divyansh.</h4>
-                    <p class="small text-light opacity-75">Curating stories that inspire.</p>
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6 text-center text-md-start">
+                <h4 class="text-white mb-3 font-playfair fw-bold">Divyansh.</h4>
+                <p class="small text-light opacity-75 mb-4">
+                    Bringing words to life since 2024. We curate the finest collection of literature, poetry, and original publications for the dreamer in you.
+                </p>
+                <div class="d-flex justify-content-center justify-content-md-start gap-3 fs-5">
+                    <a href="#" class="text-white opacity-75 hover-accent"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-white opacity-75 hover-accent"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-white opacity-75 hover-accent"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-white opacity-75 hover-accent"><i class="fab fa-linkedin-in"></i></a>
                 </div>
+            </div>
+
+            <div class="col-lg-2 col-md-6 text-center text-md-start">
+                <h6 class="text-white fw-bold mb-3">Shop With Us</h6>
+                <ul class="list-unstyled small d-flex flex-column gap-2">
+                    <li><a href="{{ route('shop', ['filter' => 'new-arrivals']) }}" class="opacity-75 hover-accent">New Arrivals</a></li>
+                    
+                    <li><a href="{{ route('shop', ['filter' => 'trending']) }}" class="opacity-75 hover-accent">Best Sellers</a></li>
+                    
+                    <li><a href="{{ route('shop', ['filter' => 'exclusive']) }}" class="opacity-75 hover-accent">Divyansh Originals</a></li>
+                    
+                    <li><a href="{{ route('authors.index') }}" class="opacity-75 hover-accent">Authors</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-2 col-md-6 text-center text-md-start">
+                <h6 class="text-white fw-bold mb-3">Customer Service</h6>
+                <ul class="list-unstyled small d-flex flex-column gap-2">
+                    <li><a href="#" class="opacity-75 hover-accent">Contact Us</a></li>
+                    <li><a href="#" class="opacity-75 hover-accent">Shipping Policy</a></li>
+                    <li><a href="#" class="opacity-75 hover-accent">Privacy Policy</a></li>
+                    <li><a href="#" class="opacity-75 hover-accent">Terms & Conditions</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-4 col-md-6 text-center text-md-start">
+                <h6 class="text-white fw-bold mb-3">Stay Updated</h6>
+                <p class="small text-light opacity-75">Subscribe to get notified about new book launches.</p>
+                <form action="#" class="mb-3">
+                    <div class="input-group">
+                        <input type="email" class="form-control form-control-sm bg-dark border-secondary text-white shadow-none" placeholder="Enter your email" style="border-radius: 50px 0 0 50px; padding-left: 15px;">
+                        <button class="btn btn-accent btn-sm px-3" type="button" style="border-radius: 0 50px 50px 0;">Join</button>
+                    </div>
+                </form>
+                <div class="small text-light opacity-75">
+                    <i class="fas fa-envelope me-2"></i> support@divyansh.com<br>
+                    <i class="fas fa-map-marker-alt me-2"></i> Patna, Bihar, India
                 </div>
-            <div class="border-top border-secondary pt-3 mt-4 text-center small opacity-50">
-                &copy; {{ date('Y') }} Divyansh Publication.
             </div>
         </div>
-    </footer>
+
+        <div class="border-top border-secondary pt-4 mt-5 d-flex flex-column flex-md-row justify-content-between align-items-center small opacity-50">
+            <div class="mb-2 mb-md-0 text-center text-md-start">
+                &copy; {{ date('Y') }} Divyansh Publication. All Rights Reserved.
+            </div>
+            <div class="d-flex gap-3">
+                <i class="fab fa-cc-visa fs-4"></i>
+                <i class="fab fa-cc-mastercard fs-4"></i>
+                <i class="fab fa-google-pay fs-4"></i>
+                <i class="fas fa-wallet fs-4"></i>
+            </div>
+        </div>
+    </div>
+</footer>
 
     <div class="mobile-bottom-nav d-lg-none">
         <a href="{{ route('shop') }}" class="nav-item {{ request()->is('shop*') ? 'active' : '' }}">
@@ -329,10 +355,16 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Global Cart UI Update Function (AJAX se chalne ke liye)
-        window.updateCartUI = function(count) {
-            $('.count-sync').text(count); 
-        };
+
+       window.updateCartUI = function(data) {
+    console.log("Cart Data Received:", data); // Isse pata chalega data aa raha hai
+    
+    // Dono (Desktop aur Mobile) badges update honge
+    $('.count-sync').text(data.cart_count); 
+    
+    // Mini-cart ka poora dabba naye HTML se replace hoga
+    $('.mini-cart-dropdown').html(data.mini_cart); 
+};
 
         function moveToNext(current, nextFieldID) {
             if (current.value.length >= current.maxLength) {
@@ -340,6 +372,6 @@
             }
         }
     </script>
-    @yield('scripts')
+    @stack('scripts')
 </body>
 </html>

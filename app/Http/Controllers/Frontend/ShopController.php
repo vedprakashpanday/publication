@@ -15,6 +15,42 @@ class ShopController extends Controller
         // 1. Base Query build karna
         $query = Book::with(['author', 'images', 'category'])->where('is_active', true);
 
+            $query = Book::query();
+
+   // Handle Filters from Homepage
+    if ($request->has('filter')) {
+        // New Arrivals Filter
+        if ($request->filter == 'new-arrivals') {
+            $query->latest();
+        }
+        
+        // ✅ Exclusive Filter (Adjustment as per your DB column)
+        if ($request->filter == 'exclusive') {
+            // Agar aapke paas flag hai:
+            // $query->where('is_exclusive', 1); 
+            
+            // Ya agar aap 'Publisher' se filter kar rahe hain (Divyansh ID = 1):
+            $query->where('publisher_id', 1); 
+        }
+
+        // ✅ Top Authors Filter Logic
+    if ($request->filter == 'top-authors') {
+        // Maan lijiye aapke Top Authors ki IDs ka ek array hai ya popular authors filter hai
+        // Example: Un authors ki kitabein jinhe admin ne 'top' mark kiya ho ya jinki ratings 4+ ho
+        $query->whereHas('author', function($q) {
+            $q->where('is_featured', 1); // Agar authors table mein aisa koi column hai
+        });
+    }
+
+    // ✅ Top Rated Filter Logic
+    if ($request->filter == 'top-rated') {
+        // Maan lijiye aapke paas rating ka average hai, toh uske hisab se sort karein
+        // Ya fir simply higher-priced/featured kitabein
+        $query->orderBy('rating', 'desc'); // Agar column hai toh, warna koi specific logic
+    }
+    }
+
+
         // 2. Search Box Filter
         if ($request->filled('search')) {
             $searchTerm = $request->search;
