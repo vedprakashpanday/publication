@@ -32,13 +32,26 @@ class HomeController extends Controller
         // 6. Trending Now / Most Read (4 books)
         $trendingBooks = Book::with(['author', 'images'])->where('is_active', true)->inRandomOrder()->take(4)->get();
 
+        // 1. Fetching Buyer Stories (Latest 6)
+    $buyerStories = \App\Models\BuyerStory::latest()->take(6)->get();
+
+    // 2. Stats (Aap inhe dynamic bhi kar sakte hain Count query se)
+    $stats = [
+        'books_sold' => '15K+', 
+        'happy_customers' => '12K+',
+        'authors' => '150+',
+        'delivery_cities' => '500+'
+    ];
+
         return view('frontend.home', compact(
             'newArrivals', 
             'exclusiveBooks', 
             'topAuthors', 
             'booksByTopAuthors', 
             'topRatedBooks', 
-            'trendingBooks'
+            'trendingBooks',
+            'buyerStories', 
+            'stats'
         ));
     }
 }

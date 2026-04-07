@@ -386,6 +386,42 @@
     </div>
 </section>
 
+<section class="py-5" style="background: var(--primary-color); border-top: 5px solid var(--accent-color);">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-6 col-md-3">
+                <div class="p-3">
+                    <i class="fas fa-book-reader text-accent mb-3 fs-1"></i>
+                    <h2 class="text-white fw-bold mb-0 font-playfair">{{ $stats['books_sold'] }}</h2>
+                    <p class="text-light opacity-75 small text-uppercase letter-spacing mt-1">Books Sold</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-3">
+                    <i class="fas fa-smile-beam text-accent mb-3 fs-1"></i>
+                    <h2 class="text-white fw-bold mb-0 font-playfair">{{ $stats['happy_customers'] }}</h2>
+                    <p class="text-light opacity-75 small text-uppercase letter-spacing mt-1">Happy Readers</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-3">
+                    <i class="fas fa-feather-alt text-accent mb-3 fs-1"></i>
+                    <h2 class="text-white fw-bold mb-0 font-playfair">{{ $stats['authors'] }}</h2>
+                    <p class="text-light opacity-75 small text-uppercase letter-spacing mt-1">Top Authors</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-3">
+                    <i class="fas fa-map-marked-alt text-accent mb-3 fs-1"></i>
+                    <h2 class="text-white fw-bold mb-0 font-playfair">{{ $stats['delivery_cities'] }}</h2>
+                    <p class="text-light opacity-75 small text-uppercase letter-spacing mt-1">Cities Covered</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
 <section class="py-5" style="background-color: var(--bg-light);">
     <div class="container">
         <div class="d-flex justify-content-between align-items-end mb-4">
@@ -440,6 +476,64 @@
         </div>
     </div>
 </section>
+
+
+<section class="py-5 bg-white overflow-hidden">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="text-uppercase fw-bold small text-muted letter-spacing">Community Love</span>
+            <h2 class="display-6 fw-bold font-playfair text-dark mt-2">Our Happy Customers</h2>
+            <p class="text-muted mx-auto" style="max-width: 600px;">Real stories from real readers who found their perfect match in our collection.</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            @foreach($buyerStories as $story)
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden buyer-story-card">
+                    <div class="position-relative">
+                        <img src="{{ asset($story->image_path) }}" class="card-img-top" alt="{{ $story->buyer_name }}" style="height: 250px; object-fit: cover;">
+                        <div class="position-absolute bottom-0 end-0 m-3 d-flex gap-2">
+                            @if($story->instagram_url)
+                                <a href="{{ $story->instagram_url }}" target="_blank" class="btn btn-sm btn-light rounded-circle shadow-sm"><i class="fab fa-instagram text-danger"></i></a>
+                            @endif
+                            @if($story->facebook_url)
+                                <a href="{{ $story->facebook_url }}" target="_blank" class="btn btn-sm btn-light rounded-circle shadow-sm"><i class="fab fa-facebook-f text-primary"></i></a>
+                            @endif
+                        </div>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h5 class="fw-bold text-dark mb-0 fs-6">{{ $story->buyer_name }}</h5>
+                                <p class="text-accent small mb-0 fw-semibold">{{ $story->event_name }}</p>
+                            </div>
+                            <span class="small text-muted opacity-75">{{ \Carbon\Carbon::parse($story->event_date)->format('M Y') }}</span>
+                        </div>
+                        <p class="text-secondary small mt-3 mb-0">
+                            "{{ $story->description ?? 'Amazing experience with Divyansh Publication!' }}"
+                        </p>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+
+        @if($buyerStories->isEmpty())
+            <div class="text-center py-5">
+                <p class="text-muted">Stay tuned! Our readers' stories are coming soon.</p>
+            </div>
+        @endif
+    </div>
+</section>
+
+<style>
+    .buyer-story-card { transition: 0.3s ease; }
+    .buyer-story-card:hover { transform: translateY(-10px); box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important; }
+    .letter-spacing { letter-spacing: 1.5px; }
+</style>
+
+
 
 @endsection
 
