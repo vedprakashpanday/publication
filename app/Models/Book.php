@@ -25,4 +25,8 @@ class Book extends Model {
     public function author() {
     return $this->belongsTo(Author::class);
 }
+
+public function reviews() {
+    return $this->hasMany(BookReview::class)->where('is_approved', 1);
+}
 }

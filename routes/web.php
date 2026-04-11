@@ -46,9 +46,9 @@ Route::get('/cart', function () {
 //     return view('frontend.checkout'); 
 // });
 
-Route::get('/udashboard', function () {
-    return view('frontend.user-dashboard'); 
-});
+// Route::get('/udashboard', function () {
+//     return view('frontend.user-dashboard'); 
+// });
 
 Auth::routes();
 
@@ -128,7 +128,9 @@ Route::get('/book/{slug}', [ShopController::class, 'show'])->name('book.show');
 // Baaki pages ke dummy routes (Inhe hum baad mein banayenge)
 Route::get('/cart', function () { return view('frontend.cart'); })->name('cart');
 
-Route::get('/my-account', function () { return view('frontend.user-dashboard'); })->name('dashboard');
+Route::get('/my-account', [App\Http\Controllers\Frontend\UserController::class, 'dashboard'])->name('dashboard');
+
+Route::put('/my-account/profile', [App\Http\Controllers\Frontend\UserController::class, 'updateProfile'])->name('user.profile.update');
 
 // Auth (Ajax Modals ke liye routes)
 Route::post('/ajax-login', [AuthController::class, 'login'])->name('ajax.login');
@@ -153,3 +155,10 @@ Route::get('/authors', [App\Http\Controllers\Frontend\AuthorController::class, '
 
 // Single Author Details
 Route::get('/author/{id}', [App\Http\Controllers\Frontend\AuthorController::class, 'show'])->name('authors.show');
+
+Route::get('/load-section', [App\Http\Controllers\Frontend\HomeController::class, 'loadSection'])->name('home.loadSection');
+
+
+Route::get('/memories', [App\Http\Controllers\Frontend\GalleryController::class, 'index'])->name('gallery.index');
+
+Route::post('/wishlist/toggle', [App\Http\Controllers\Frontend\WishlistController::class, 'toggle'])->name('wishlist.toggle');

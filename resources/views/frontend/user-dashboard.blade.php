@@ -101,11 +101,11 @@
 <div class="body-padding-mobile">
 
     <div class="dashboard-header shadow-sm">
-        <div class="container">
-            <h1 class="user-greeting">Welcome back, John!</h1>
-            <p class="text-muted mb-0 small mt-1">Manage your account and track orders.</p>
-        </div>
+    <div class="container">
+        <h1 class="user-greeting">Welcome back, {{ explode(' ', auth()->user()->name)[0] }}!</h1>
+        <p class="text-muted mb-0 small mt-1">Manage your account and track orders.</p>
     </div>
+</div>
 
     <section class="py-3 py-md-4">
         <div class="container">
@@ -143,74 +143,51 @@
                         <div class="tab-pane fade show active" id="tab-orders" role="tabpanel">
                             <div class="dashboard-card">
                                 <h2 class="card-title-dash d-flex justify-content-between align-items-center">
-                                    Order History
-                                    <span class="badge bg-light text-dark border fs-6 fw-normal d-none d-sm-inline-block">3 Orders</span>
-                                </h2>
+    Order History
+    <span class="badge bg-light text-dark border fs-6 fw-normal d-none d-sm-inline-block">{{ $orders->count() }} Orders</span>
+</h2>
 
-                                <div class="order-item">
-                                    <div class="order-header">
-                                        <div>
-                                            <div class="order-id">#DVP-9824</div>
-                                            <div class="order-date">12 Mar 2026</div>
-                                        </div>
-                                        <div class="order-status status-shipped">
-                                            <i class="fas fa-truck"></i> Shipped
-                                        </div>
-                                    </div>
-                                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
-                                        <div class="order-product">
-                                            <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=150&auto=format&fit=crop" class="order-img" alt="Book">
-                                            <div>
-                                                <h4 class="order-title">The Art of Storytelling</h4>
-                                                <p class="order-author">Ved Prakash Panday</p>
-                                                <div class="order-price">₹299 <span class="text-muted small fw-normal ms-1">| Qty: 1</span></div>
-                                            </div>
-                                        </div>
-                                        <div class="order-actions">
-                                            <button class="btn btn-track w-100">Track Package</button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="order-item">
-                                    <div class="order-header">
-                                        <div>
-                                            <div class="order-id">#DVP-9855</div>
-                                            <div class="order-date">15 Mar 2026</div>
-                                        </div>
-                                        <div class="order-status status-processing">
-                                            <i class="fas fa-box"></i> Processing
-                                        </div>
-                                    </div>
-                                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
-                                        <div class="order-product">
-                                            <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=150&auto=format&fit=crop" class="order-img" alt="Book">
-                                            <div>
-                                                <h4 class="order-title">Ghazals of the Night</h4>
-                                                <p class="order-author">Aman Verma</p>
-                                                <div class="order-price">₹499 <span class="text-muted small fw-normal ms-1">| Qty: 1</span></div>
-                                            </div>
-                                        </div>
-                                        <div class="order-actions">
-                                            <button class="btn btn-track w-100">Order Details</button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <nav class="mt-4 d-none d-md-block" aria-label="Page navigation">
-                                    <ul class="pagination justify-content-center mb-0">
-                                        <li class="page-item disabled"><a class="page-link shadow-none" href="#" tabindex="-1"><i class="fas fa-chevron-left"></i></a></li>
-                                        <li class="page-item active"><a class="page-link shadow-none bg-dark border-dark text-white" href="#">1</a></li>
-                                        <li class="page-item"><a class="page-link shadow-none text-dark" href="#">2</a></li>
-                                        <li class="page-item"><a class="page-link shadow-none text-dark" href="#"><i class="fas fa-chevron-right"></i></a></li>
-                                    </ul>
-                                </nav>
-
-                                <div class="text-center mt-4 d-md-none">
-                                    <button class="btn btn-outline-dark rounded-pill px-5 py-2 fw-bold shadow-sm w-100">
-                                        Load More Orders <i class="fas fa-sync-alt ms-2"></i>
-                                    </button>
-                                </div>
+@forelse($orders as $order)
+    <div class="order-item">
+        <div class="order-header">
+            <div>
+                <div class="order-id">#DVP-{{ $order->order_number }}</div>
+                <div class="order-date">{{ $order->created_at->format('d M Y') }}</div>
+            </div>
+            <div class="order-status {{ $order->status == 'delivered' ? 'status-delivered' : 'status-processing' }}">
+                <i class="fas {{ $order->status == 'delivered' ? 'fa-check-circle' : 'fa-box' }}"></i> {{ ucfirst($order->status) }}
+            </div>
+        </div>
+        
+        @foreach($order->items as $item)
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3">
+            <div class="order-product">
+                @php $frontImg = $item->book->images->where('image_type', 'front')->first(); @endphp
+                <img src="{{ $frontImg ? asset('storage/'.$frontImg->image_path) : 'default.jpg' }}" class="order-img" alt="Book">
+                <div>
+                    <h4 class="order-title">{{ $item->book->title }}</h4>
+                    <p class="order-author">{{ $item->book->author->name ?? '' }}</p>
+                    <div class="order-price">₹{{ $item->price }} <span class="text-muted small fw-normal ms-1">| Qty: {{ $item->quantity }}</span></div>
+                </div>
+            </div>
+            
+            @if($order->status == 'delivered')
+            <div class="order-actions mt-2 mt-md-0">
+                <button class="btn btn-sm btn-outline-warning w-100" data-bs-toggle="modal" data-bs-target="#reviewModal{{ $item->book->id }}">
+                    <i class="fas fa-star"></i> Rate & Review
+                </button>
+            </div>
+            @endif
+        </div>
+        @endforeach
+    </div>
+@empty
+    <div class="text-center py-4">
+        <i class="fas fa-box-open fs-1 text-muted opacity-50 mb-3"></i>
+        <p class="text-muted">You haven't placed any orders yet.</p>
+        <a href="{{ route('shop') }}" class="btn btn-accent rounded-pill px-4">Start Shopping</a>
+    </div>
+@endforelse
 
                             </div>
                         </div>
@@ -218,26 +195,26 @@
                         <div class="tab-pane fade" id="tab-profile" role="tabpanel">
                             <div class="dashboard-card">
                                 <h2 class="card-title-dash">Personal Information</h2>
-                                <form action="#" method="POST">
-                                    @csrf @method('PUT')
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label">Full Name</label>
-                                            <input type="text" name="name" class="form-control" value="John Doe" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Email Address</label>
-                                            <input type="email" name="email" class="form-control bg-light" value="john@example.com" readonly>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Phone Number</label>
-                                            <input type="tel" name="phone" class="form-control" value="+91 9876543210">
-                                        </div>
-                                        <div class="col-12 mt-3">
-                                            <button type="submit" class="btn btn-save w-100 w-sm-auto">Save Changes</button>
-                                        </div>
-                                    </div>
-                                </form>
+                               <form action="{{ route('user.profile.update') }}" method="POST">
+    @csrf @method('PUT')
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label">Full Name</label>
+            <input type="text" name="name" class="form-control" value="{{ auth()->user()->name }}" required>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Email Address</label>
+            <input type="email" name="email" class="form-control bg-light" value="{{ auth()->user()->email }}" readonly>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" name="phone" class="form-control" value="{{ auth()->user()->phone ?? '' }}">
+        </div>
+        <div class="col-12 mt-3">
+            <button type="submit" class="btn btn-save w-100 w-sm-auto">Save Changes</button>
+        </div>
+    </div>
+</form>
                             </div>
 
                             <div class="dashboard-card">
@@ -270,13 +247,66 @@
                             </div>
                         </div>
 
-                        <div class="tab-pane fade" id="tab-wishlist" role="tabpanel">
-                            <div class="dashboard-card">
-                                <h2 class="card-title-dash">My Wishlist</h2>
-                                <p class="text-muted">You haven't added any books to your wishlist yet.</p>
+                       <div class="tab-pane fade" id="tab-wishlist" role="tabpanel">
+    <div class="dashboard-card">
+        <h2 class="card-title-dash d-flex justify-content-between align-items-center">
+            My Wishlist
+            <span class="badge bg-light text-dark border fs-6 fw-normal d-none d-sm-inline-block" id="wishlist-count">{{ $wishlists->count() }} Books</span>
+        </h2>
+
+        @if($wishlists->count() > 0)
+            <div class="row g-3">
+                @foreach($wishlists as $item)
+                @if($item->book)
+                <div class="col-12 col-md-6 col-lg-4 wishlist-item-wrapper-{{ $item->book->id }}">
+                    <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden" style="border: 1px solid #e2e8f0 !important;">
+                        <div class="position-relative">
+                            <button class="btn btn-sm btn-light rounded-circle shadow-sm position-absolute m-2 top-0 end-0 remove-from-wishlist" 
+                                    data-id="{{ $item->book->id }}" title="Remove from Wishlist" style="z-index: 10;">
+                                <i class="fas fa-trash-alt text-danger"></i>
+                            </button>
+                            
+                            <a href="{{ route('book.show', $item->book->slug ?? $item->book->id) }}" class="d-block">
+                                @php $frontImage = $item->book->images->where('image_type', 'front')->first(); @endphp
+                                <img src="{{ $frontImage ? asset('storage/'.$frontImage->image_path) : 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=400&auto=format&fit=crop' }}" 
+                                     class="card-img-top w-100" alt="{{ $item->book->title }}" style="aspect-ratio: 2/3; object-fit: cover;">
+                            </a>
+                        </div>
+                        
+                        <div class="card-body p-3 d-flex flex-column">
+                            <a href="{{ route('book.show', $item->book->slug ?? $item->book->id) }}" class="text-decoration-none">
+                                <h6 class="fw-bold text-dark mb-1 text-truncate" title="{{ $item->book->title }}">{{ $item->book->title }}</h6>
+                            </a>
+                            <p class="small text-muted mb-2">{{ $item->book->author->name ?? 'Unknown Author' }}</p>
+                            
+                            <div class="mt-auto d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-accent">₹{{ $item->book->price }}</span>
+                                <button type="button" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold add-to-cart-home" data-id="{{ $item->book->id }}">
+                                    Add <i class="fas fa-shopping-bag ms-1"></i>
+                                </button>
                             </div>
                         </div>
-
+                    </div>
+                </div>
+                @endif
+                @endforeach
+            </div>
+            
+            <div class="text-center py-5 d-none" id="empty-wishlist-msg">
+                <i class="far fa-heart fs-1 text-muted opacity-50 mb-3"></i>
+                <p class="text-muted">Your wishlist is empty now.</p>
+                <a href="{{ route('shop') }}" class="btn btn-accent rounded-pill px-4">Discover Books</a>
+            </div>
+            
+        @else
+            <div class="text-center py-5">
+                <i class="far fa-heart fs-1 text-muted opacity-50 mb-3"></i>
+                <p class="text-muted">You haven't added any books to your wishlist yet.</p>
+                <a href="{{ route('shop') }}" class="btn btn-accent rounded-pill px-4">Discover Books</a>
+            </div>
+        @endif
+    </div>
+</div>
                         <div class="tab-pane fade" id="tab-address" role="tabpanel">
                             <div class="dashboard-card">
                                 <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
@@ -307,3 +337,107 @@
 </div>
 
 @endsection
+
+@push('scripts')
+    <script>
+$(document).ready(function() {
+
+// 🌟 Check URL for tab parameters (e.g., ?tab=wishlist)
+    const urlParams = new URLSearchParams(window.location.search);
+    const activeTab = urlParams.get('tab');
+
+    if (activeTab) {
+        // Tab ka target dhundo (jaise: #tab-wishlist)
+        let targetButton = $('button[data-bs-target="#tab-' + activeTab + '"]');
+        
+        // Agar button mil gaya toh usko active (click) kar do
+        if (targetButton.length > 0) {
+            targetButton.tab('show'); // Bootstrap 5 ka tab switch method
+        }
+    }
+
+
+
+      $(document).on('click', '.add-to-cart-home', function(e) {
+        e.preventDefault();
+        let bookId = $(this).data('id');
+        let btn = $(this);
+        
+        btn.html('<i class="fas fa-spinner fa-spin"></i>'); // Loading state
+
+        $.ajax({
+            url: "{{ route('cart.add') }}",
+            method: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                book_id: bookId,
+                quantity: 1
+            },
+            success: function(response) {
+                btn.html('<i class="fas fa-check"></i>');
+                setTimeout(() => btn.html('<i class="fas fa-cart-plus"></i>'), 2000);
+
+                if (typeof window.updateCartUI === 'function') {
+                    window.updateCartUI(response); 
+                }
+
+                Swal.fire({
+                    toast: true,
+                    position: 'bottom-end',
+                    icon: 'success',
+                    title: 'Added to your bag!',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    background: '#1e293b',
+                    color: '#fff'
+                });
+            }
+        });
+    });
+
+
+
+
+    // Remove from Wishlist (Dashboard specific)
+    $(document).on('click', '.remove-from-wishlist', function(e) {
+        e.preventDefault();
+        let btn = $(this);
+        let bookId = btn.data('id');
+        
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin text-danger"></i>');
+
+        $.ajax({
+            url: "{{ route('wishlist.toggle') }}", // Hum wahi controller method use kar rahe hain
+            type: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                book_id: bookId
+            },
+            success: function(response) {
+                if(response.status === 'removed') {
+                    // Card ko slowly fade out karke remove kar do
+                    $('.wishlist-item-wrapper-' + bookId).fadeOut(300, function() {
+                        $(this).remove();
+                        
+                        // Count update karo
+                        let currentCount = parseInt($('#wishlist-count').text());
+                        if(!isNaN(currentCount)) {
+                            let newCount = currentCount - 1;
+                            $('#wishlist-count').text(newCount + ' Books');
+                            
+                            // Agar 0 ho gaya toh empty message dikhao
+                            if(newCount === 0) {
+                                $('.row.g-3').hide();
+                                $('#empty-wishlist-msg').removeClass('d-none');
+                            }
+                        }
+                    });
+                    
+                    Swal.fire({ toast: true, position: 'bottom-end', icon: 'success', title: 'Removed from wishlist', showConfirmButton: false, timer: 1500 });
+                }
+            }
+        });
+    });
+});
+</script>
+@endpush

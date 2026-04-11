@@ -190,6 +190,10 @@
     <li class="nav-item">
         <a class="nav-link {{ request()->is('authors*') ? 'active' : '' }}" href="{{ route('authors.index') }}">Authors</a>
     </li>
+
+     <li class="nav-item">
+    <a class="nav-link {{ request()->is('memories*') ? 'active' : '' }}" href="{{ route('gallery.index') }}">Memories</a>
+</li>
 </ul>
 
                 <div class="d-flex align-items-center gap-3">
@@ -211,24 +215,31 @@
                     @else
                         <div class="dropdown">
                             <a href="#" class="text-dark fs-5 dropdown-toggle text-decoration-none" data-bs-toggle="dropdown"><i class="far fa-user-circle"></i></a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-3 rounded-3" style="width: 250px;">
-                                <li class="px-4 py-3 border-bottom mb-2 bg-light rounded-top">
-                                    <div class="fw-bold text-dark font-playfair fs-6">{{ Auth::user()->name ?? 'Book Lover' }}</div>
-                                    <div class="small text-muted text-truncate">{{ Auth::user()->email ?? '' }}</div>
-                                </li>
-                                <li><a class="dropdown-item py-2 px-4" href="{{ route('dashboard') ?? '#' }}"><i class="fas fa-chart-line me-2 text-muted" style="width: 20px;"></i> My Dashboard</a></li>
-                                <li><a class="dropdown-item py-2 px-4" href="#"><i class="fas fa-box me-2 text-muted" style="width: 20px;"></i> My Orders</a></li>
-                                <li><a class="dropdown-item py-2 px-4" href="#"><i class="far fa-heart me-2 text-muted" style="width: 20px;"></i> Saved for Later</a></li>
-                                <li><a class="dropdown-item py-2 px-4" href="#"><i class="far fa-address-book me-2 text-muted" style="width: 20px;"></i> Addresses</a></li>
-                                <li><hr class="dropdown-divider mx-3"></li>
-                                <li><a class="dropdown-item py-2 px-4" href="#"><i class="fas fa-user-cog me-2 text-muted" style="width: 20px;"></i> Profile Settings</a></li>
-                                <li>
-                                    <form action="{{ route('logout') }}" method="POST" class="px-2">
-                                        @csrf
-                                        <button class="dropdown-item py-2 text-danger rounded"><i class="fas fa-sign-out-alt me-2" style="width: 20px;"></i> Logout</button>
-                                    </form>
-                                </li>
-                            </ul>
+                          <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-3 rounded-3" style="width: 250px;">
+    <li class="px-4 py-3 border-bottom mb-2 bg-light rounded-top">
+        <div class="fw-bold text-dark font-playfair fs-6">{{ Auth::user()->name ?? 'Book Lover' }}</div>
+        <div class="small text-muted text-truncate">{{ Auth::user()->email ?? '' }}</div>
+    </li>
+    
+    <li><a class="dropdown-item py-2 px-4" href="{{ route('dashboard') }}"><i class="fas fa-chart-line me-2 text-muted" style="width: 20px;"></i> My Dashboard</a></li>
+    
+    <li><a class="dropdown-item py-2 px-4" href="{{ route('dashboard') }}?tab=orders"><i class="fas fa-box me-2 text-muted" style="width: 20px;"></i> My Orders</a></li>
+    
+    <li><a class="dropdown-item py-2 px-4" href="{{ route('dashboard') }}?tab=wishlist"><i class="far fa-heart me-2 text-muted" style="width: 20px;"></i> Saved for Later</a></li>
+    
+    <li><a class="dropdown-item py-2 px-4" href="{{ route('dashboard') }}?tab=address"><i class="far fa-address-book me-2 text-muted" style="width: 20px;"></i> Addresses</a></li>
+    
+    <li><hr class="dropdown-divider mx-3"></li>
+    
+    <li><a class="dropdown-item py-2 px-4" href="{{ route('dashboard') }}?tab=profile"><i class="fas fa-user-cog me-2 text-muted" style="width: 20px;"></i> Profile Settings</a></li>
+    
+    <li>
+        <form action="{{ route('logout') }}" method="POST" class="px-2">
+            @csrf
+            <button class="dropdown-item py-2 text-danger rounded"><i class="fas fa-sign-out-alt me-2" style="width: 20px;"></i> Logout</button>
+        </form>
+    </li>
+</ul>
                         </div>
                     @endguest
                 </div>
