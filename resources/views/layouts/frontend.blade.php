@@ -100,6 +100,24 @@
         /* Mobile par hover dropdown chhipane ke liye */
         @media (max-width: 991.98px) {
             .nav-cart-wrapper .mini-cart-dropdown { display: none !important; }
+
+            /* 🌟 Wishlist Mobile UI Adjustments */
+    .wishlist-card { border-radius: 8px !important; }
+    .wishlist-card .card-body { padding: 10px !important; }
+    .wishlist-title { font-size: 0.85rem !important; margin-bottom: 2px !important; }
+    .wishlist-author { font-size: 0.75rem !important; margin-bottom: 8px !important; }
+    .wishlist-price { font-size: 0.95rem !important; }
+    .wishlist-add-btn { padding: 4px 10px !important; font-size: 0.75rem !important; }
+    
+    /* Trash button ko thoda chhota aur side me kiya */
+    .remove-from-wishlist { 
+        width: 28px !important; 
+        height: 28px !important; 
+        padding: 0 !important; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+    }
         }
 
         /* Footer */
@@ -333,9 +351,15 @@
             <span class="badge rounded-pill cart-badge-mobile count-sync">{{ $cartCount }}</span>
             <span>Cart</span>
         </a>
-        <a href="#" class="nav-item" data-bs-toggle="modal" data-bs-target="{{ Auth::check() ? '' : '#loginModal' }}">
-            <i class="far fa-user"></i><span>Profile</span>
-        </a>
+        @auth
+    <a href="{{ route('dashboard') }}" class="nav-item {{ request()->is('my-account*') || request()->is('dashboard*') ? 'active' : '' }}">
+        <i class="far fa-user"></i><span>Profile</span>
+    </a>
+@else
+    <a href="#" class="nav-item" data-bs-toggle="modal" data-bs-target="#loginModal">
+        <i class="far fa-user"></i><span>Profile</span>
+    </a>
+@endauth
     </div>
 
     <div class="modal fade search-modal" id="searchModal" tabindex="-1">

@@ -162,3 +162,12 @@ Route::get('/load-section', [App\Http\Controllers\Frontend\HomeController::class
 Route::get('/memories', [App\Http\Controllers\Frontend\GalleryController::class, 'index'])->name('gallery.index');
 
 Route::post('/wishlist/toggle', [App\Http\Controllers\Frontend\WishlistController::class, 'toggle'])->name('wishlist.toggle');
+
+// User Addresses
+Route::post('/my-account/address', [App\Http\Controllers\Frontend\UserController::class, 'storeAddress'])->name('address.store');
+Route::delete('/my-account/address/{id}', [App\Http\Controllers\Frontend\UserController::class, 'destroyAddress'])->name('address.destroy');
+
+Route::put('/my-account/address/{id}', [App\Http\Controllers\Frontend\UserController::class, 'updateAddress'])->name('address.update');
+
+// Razorpay Verification Route
+Route::post('/checkout/verify-payment', [App\Http\Controllers\Frontend\CheckoutController::class, 'verifyPayment'])->name('razorpay.verify');

@@ -29,7 +29,7 @@
                 <a href="{{ route('shop') }}" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-sm">
                     Continue Shopping
                 </a>
-                <a href="#" class="btn btn-outline-dark btn-lg rounded-pill px-5 py-3 fw-bold">
+                <a href="{{ route('dashboard') }}?tab=orders" class="btn btn-outline-dark btn-lg rounded-pill px-5 py-3 fw-bold">
                     View My Orders
                 </a>
             </div>

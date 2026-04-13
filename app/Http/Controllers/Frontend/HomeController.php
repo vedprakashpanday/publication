@@ -26,6 +26,8 @@ class HomeController extends Controller
         $wishlistIds = \App\Models\Wishlist::where('user_id', Auth::id())->pluck('book_id')->toArray();
     }
     
+
+    
     $stats = [
         'books_sold' => '15K+', 
         'happy_customers' => '12K+',

@@ -255,42 +255,41 @@
         </h2>
 
         @if($wishlists->count() > 0)
-            <div class="row g-3">
-                @foreach($wishlists as $item)
-                @if($item->book)
-                <div class="col-12 col-md-6 col-lg-4 wishlist-item-wrapper-{{ $item->book->id }}">
-                    <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden" style="border: 1px solid #e2e8f0 !important;">
-                        <div class="position-relative">
-                            <button class="btn btn-sm btn-light rounded-circle shadow-sm position-absolute m-2 top-0 end-0 remove-from-wishlist" 
-                                    data-id="{{ $item->book->id }}" title="Remove from Wishlist" style="z-index: 10;">
-                                <i class="fas fa-trash-alt text-danger"></i>
-                            </button>
-                            
-                            <a href="{{ route('book.show', $item->book->slug ?? $item->book->id) }}" class="d-block">
-                                @php $frontImage = $item->book->images->where('image_type', 'front')->first(); @endphp
-                                <img src="{{ $frontImage ? asset('storage/'.$frontImage->image_path) : 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=400&auto=format&fit=crop' }}" 
-                                     class="card-img-top w-100" alt="{{ $item->book->title }}" style="aspect-ratio: 2/3; object-fit: cover;">
-                            </a>
-                        </div>
-                        
-                        <div class="card-body p-3 d-flex flex-column">
-                            <a href="{{ route('book.show', $item->book->slug ?? $item->book->id) }}" class="text-decoration-none">
-                                <h6 class="fw-bold text-dark mb-1 text-truncate" title="{{ $item->book->title }}">{{ $item->book->title }}</h6>
-                            </a>
-                            <p class="small text-muted mb-2">{{ $item->book->author->name ?? 'Unknown Author' }}</p>
-                            
-                            <div class="mt-auto d-flex justify-content-between align-items-center">
-                                <span class="fw-bold text-accent">₹{{ $item->book->price }}</span>
-                                <button type="button" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold add-to-cart-home" data-id="{{ $item->book->id }}">
-                                    Add <i class="fas fa-shopping-bag ms-1"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @endif
-                @endforeach
+          <div class="row g-2 g-md-3"> @foreach($wishlists as $item)
+    @if($item->book)
+    <div class="col-6 col-md-6 col-lg-4 wishlist-item-wrapper-{{ $item->book->id }}">
+        <div class="card wishlist-card h-100 border-0 shadow-sm rounded-3 overflow-hidden" style="border: 1px solid #e2e8f0 !important;">
+            <div class="position-relative">
+                <button class="btn btn-sm btn-light rounded-circle shadow-sm position-absolute m-2 top-0 end-0 remove-from-wishlist" 
+                        data-id="{{ $item->book->id }}" title="Remove from Wishlist" style="z-index: 10;">
+                    <i class="fas fa-trash-alt text-danger" style="font-size: 0.85rem;"></i>
+                </button>
+                
+                <a href="{{ route('book.show', $item->book->slug ?? $item->book->id) }}" class="d-block">
+                    @php $frontImage = $item->book->images->where('image_type', 'front')->first(); @endphp
+                    <img src="{{ $frontImage ? asset('storage/'.$frontImage->image_path) : 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=400&auto=format&fit=crop' }}" 
+                         class="card-img-top w-100" alt="{{ $item->book->title }}" style="aspect-ratio: 2/2; object-fit: cover;">
+                </a>
             </div>
+            
+            <div class="card-body p-3 d-flex flex-column">
+                <a href="{{ route('book.show', $item->book->slug ?? $item->book->id) }}" class="text-decoration-none">
+                    <h6 class="fw-bold text-dark mb-1 text-truncate wishlist-title" title="{{ $item->book->title }}">{{ $item->book->title }}</h6>
+                </a>
+                <p class="small text-muted mb-2 wishlist-author text-truncate">{{ $item->book->author->name ?? 'Unknown Author' }}</p>
+                
+                <div class="mt-auto d-flex justify-content-between align-items-center flex-wrap gap-1">
+                    <span class="fw-bold text-accent wishlist-price">₹{{ $item->book->price }}</span>
+                    <button type="button" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold add-to-cart-home wishlist-add-btn" data-id="{{ $item->book->id }}">
+                        Add <i class="fas fa-shopping-bag ms-1 d-none d-sm-inline"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+    @endforeach
+</div>
             
             <div class="text-center py-5 d-none" id="empty-wishlist-msg">
                 <i class="far fa-heart fs-1 text-muted opacity-50 mb-3"></i>
@@ -308,24 +307,185 @@
     </div>
 </div>
                         <div class="tab-pane fade" id="tab-address" role="tabpanel">
-                            <div class="dashboard-card">
-                                <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
-                                    <h2 class="card-title-dash border-0 mb-0 pb-0">Saved Addresses</h2>
-                                    <button class="btn btn-dark btn-sm rounded-pill px-3"><i class="fas fa-plus"></i> <span class="d-none d-sm-inline ms-1">Add New</span></button>
-                                </div>
+    <div class="dashboard-card">
+        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+            <h2 class="card-title-dash border-0 mb-0 pb-0">Saved Addresses</h2>
+            <button type="button" class="btn btn-dark btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                <i class="fas fa-plus"></i> <span class="d-none d-sm-inline ms-1">Add New</span>
+            </button>
+        </div>
 
-                                <div class="border rounded-3 p-3 position-relative bg-light">
-                                    <span class="badge bg-success position-absolute top-0 end-0 m-2">Default</span>
-                                    <h5 class="fw-bold fs-6 mb-1 text-dark">John Doe</h5>
-                                    <p class="text-muted small mb-1">+91 9876543210</p>
-                                    <p class="text-dark small mb-2 lh-sm">123, Publisher Street, Knowledge Park,<br>New Delhi, DL - 110001, India</p>
-                                    <div class="d-flex gap-3 border-top pt-2 mt-2">
-                                        <a href="#" class="text-accent fw-bold small text-decoration-none"><i class="fas fa-edit me-1"></i> Edit</a>
-                                        <a href="#" class="text-danger fw-bold small text-decoration-none"><i class="fas fa-trash-alt me-1"></i> Delete</a>
-                                    </div>
-                                </div>
+        <div class="row g-3">
+            @forelse($addresses as $address)
+            <div class="col-md-6">
+                <div class="border rounded-3 p-3 position-relative bg-light h-100">
+                    @if($address->is_default)
+                        <span class="badge bg-success position-absolute top-0 end-0 m-2">Default</span>
+                    @endif
+                    <h5 class="fw-bold fs-6 mb-1 text-dark">{{ $address->first_name }} {{ $address->last_name }}</h5>
+                    <p class="text-muted small mb-1">{{ $address->phone }}</p>
+                    <p class="text-dark small mb-2 lh-sm">
+                        {{ $address->address_line }}, 
+                        @if($address->apartment) {{ $address->apartment }}, @endif <br>
+                        {{ $address->city }}, {{ $address->state }} - {{ $address->pincode }}
+                    </p>
+                    
+                    <div class="d-flex gap-3 border-top pt-2 mt-2">
+                       <button type="button" class="btn btn-link text-accent p-0 fw-bold small text-decoration-none border-0 align-baseline edit-address-btn" 
+    data-id="{{ $address->id }}"
+    data-fname="{{ $address->first_name }}"
+    data-lname="{{ $address->last_name }}"
+    data-phone="{{ $address->phone }}"
+    data-address="{{ $address->address_line }}"
+    data-apt="{{ $address->apartment }}"
+    data-city="{{ $address->city }}"
+    data-state="{{ $address->state }}"
+    data-pin="{{ $address->pincode }}"
+    data-default="{{ $address->is_default }}">
+    <i class="fas fa-edit me-1"></i> Edit
+</button>
+                        
+                        <form action="{{ route('address.destroy', $address->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this address?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-link text-danger p-0 fw-bold small text-decoration-none border-0 align-baseline"><i class="fas fa-trash-alt me-1"></i> Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            @empty
+            <div class="col-12 text-center py-4">
+                <i class="far fa-map fs-1 text-muted opacity-50 mb-3"></i>
+                <p class="text-muted">You haven't saved any addresses yet.</p>
+            </div>
+            @endforelse
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold font-playfair" id="addAddressModalLabel">Add New Address</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ route('address.store') }}" method="POST">
+                    @csrf
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">First Name</label>
+                            <input type="text" name="first_name" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" name="last_name" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" name="phone" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Address Line</label>
+                            <input type="text" name="address_line" class="form-control" placeholder="House No, Building, Street" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Apartment / Suite (Optional)</label>
+                            <input type="text" name="apartment" class="form-control">
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">City</label>
+                            <input type="text" name="city" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">State</label>
+                            <input type="text" name="state" class="form-control" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Pincode</label>
+                            <input type="text" name="pincode" class="form-control" required>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <div class="form-check">
+                                <input class="form-check-input shadow-none" type="checkbox" name="is_default" value="1" id="defaultCheck">
+                                <label class="form-check-label text-muted small" for="defaultCheck">
+                                    Set as default shipping address
+                                </label>
                             </div>
                         </div>
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-dark w-100 py-2 fw-bold rounded-pill">Save Address</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="editAddressModal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold font-playfair" id="editAddressModalLabel">Edit Address</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editAddressForm" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">First Name</label>
+                            <input type="text" name="first_name" id="edit_first_name" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" name="last_name" id="edit_last_name" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" name="phone" id="edit_phone" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Address Line</label>
+                            <input type="text" name="address_line" id="edit_address_line" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Apartment / Suite (Optional)</label>
+                            <input type="text" name="apartment" id="edit_apartment" class="form-control">
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">City</label>
+                            <input type="text" name="city" id="edit_city" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">State</label>
+                            <input type="text" name="state" id="edit_state" class="form-control" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Pincode</label>
+                            <input type="text" name="pincode" id="edit_pincode" class="form-control" required>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <div class="form-check">
+                                <input class="form-check-input shadow-none" type="checkbox" name="is_default" value="1" id="edit_defaultCheck">
+                                <label class="form-check-label text-muted small" for="edit_defaultCheck">
+                                    Set as default shipping address
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-dark w-100 py-2 fw-bold rounded-pill">Update Address</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
                     </div>
                 </div>
@@ -437,6 +597,33 @@ $(document).ready(function() {
                 }
             }
         });
+    });
+
+    $(document).on('click', '.edit-address-btn', function() {
+        let btn = $(this);
+        
+        // Form mein purana data bhar rahe hain
+        $('#edit_first_name').val(btn.data('fname'));
+        $('#edit_last_name').val(btn.data('lname'));
+        $('#edit_phone').val(btn.data('phone'));
+        $('#edit_address_line').val(btn.data('address'));
+        $('#edit_apartment').val(btn.data('apt'));
+        $('#edit_city').val(btn.data('city'));
+        $('#edit_state').val(btn.data('state'));
+        $('#edit_pincode').val(btn.data('pin'));
+        
+        if(btn.data('default') == 1 || btn.data('default') === true) {
+            $('#edit_defaultCheck').prop('checked', true);
+        } else {
+            $('#edit_defaultCheck').prop('checked', false);
+        }
+        
+        // Form ka action URL dynamically set kar rahe hain ID ke hisaab se
+        let updateUrl = "{{ url('/my-account/address') }}/" + btn.data('id');
+        $('#editAddressForm').attr('action', updateUrl);
+        
+        // Modal open karein
+        $('#editAddressModal').modal('show');
     });
 });
 </script>

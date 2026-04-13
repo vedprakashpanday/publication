@@ -6,11 +6,12 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+  public function up()
 {
     Schema::create('customer_addresses', function (Blueprint $table) {
         $table->id();
-        $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
+        // 🌟 CHANGE YAHAN HAI: customer_id hata kar user_id kiya
+        $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
         $table->string('first_name');
         $table->string('last_name');
         $table->string('phone');
